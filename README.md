@@ -34,3 +34,23 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Supabase `profiles` Table Setup
+
+Run this SQL in your Supabase SQL editor to create the `profiles` table:
+
+```sql
+create table profiles (
+  id uuid references auth.users not null primary key,
+  name text,
+  email text,
+  role text check (role in ('parent', 'provider')),
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Ensure the relationship between auth.users and profiles is maintained
+alter table profiles enable row level security;
+
+create policy "Allow individual access to own profile" on profiles
+  for all using (auth.uid() = id);
+```
