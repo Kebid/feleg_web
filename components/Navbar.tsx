@@ -8,7 +8,9 @@ export default function Navbar() {
   return (
     <nav className="bg-white shadow-md px-4 py-2 flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <span className="font-bold text-xl text-blue-700 tracking-tight">Feleg</span>
+        <Link href="/">
+          <span className="font-bold text-xl text-blue-700 tracking-tight cursor-pointer">Feleg</span>
+        </Link>
       </div>
       <div className="flex items-center gap-4">
         <Link href="/dashboard/parent" className={`hover:text-blue-700 ${pathname.startsWith("/dashboard/parent") ? "text-blue-700 font-semibold" : "text-gray-700"}`}>Parent</Link>
