@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function Home() {
   const router = useRouter();
@@ -28,25 +29,49 @@ export default function Home() {
   return (
     <main className="bg-[#F9FAFB] min-h-screen flex flex-col justify-between">
       {/* Hero Section */}
-      <section className="bg-[#F9FAFB] py-16 px-4 flex flex-col md:flex-row items-center justify-between gap-8 min-h-[60vh]">
-        <div className="flex-1 space-y-6 flex flex-col items-start justify-center reveal opacity-0 translate-y-8 transition-all duration-700">
-          <h1 className="text-4xl md:text-5xl font-bold text-[#111827]">Discover Enrichment Programs for Your Child</h1>
-          <p className="text-lg md:text-xl text-[#111827]">Browse and apply to top STEM, Art, and Sports programs near you</p>
-          <div className="flex gap-4 mt-6">
-            <Link href="/dashboard/parent">
-              <span className="inline-block bg-[#3B82F6] text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-blue-700 transition">Browse Programs</span>
-            </Link>
-            <Link href="/signup">
-              <span className="inline-block bg-[#F59E0B] text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-yellow-600 transition">Register as a Provider</span>
-            </Link>
-          </div>
-        </div>
-        <div className="flex-1 flex justify-center items-center reveal opacity-0 translate-y-8 transition-all duration-700 mt-8 md:mt-0">
-          <img
-            src="https://undraw.co/api/illustrations/5e1f03dc-f835-4c68-803a-3a60c5a8359f"
-            alt="Enrichment Illustration"
-            className="max-w-full h-auto md:max-w-md lg:max-w-lg"
-          />
+      <section className="bg-[#F9FAFB] py-12 px-4 flex justify-center">
+        <div className="w-full max-w-6xl rounded-3xl bg-[#F9FAFB] p-6 md:p-12 flex flex-col md:flex-row items-center shadow-none">
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            className="flex-1 flex flex-col items-start justify-center space-y-6 md:pr-8"
+          >
+            <h1 className="text-4xl md:text-5xl font-extrabold text-[#111827] leading-tight">
+              Feleg: Unlock your child's full potential
+            </h1>
+            <p className="text-lg md:text-xl text-[#111827]">
+              Browse and apply to programs tailored to your child's age and interest
+            </p>
+            <div className="flex gap-4 mt-4">
+              <motion.a
+                href="/dashboard/parent"
+                whileHover={{ scale: 1.05, boxShadow: "0 4px 24px 0 #3B82F655" }}
+                className="inline-block bg-[#3B82F6] text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-blue-200 transition focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2"
+              >
+                Browse Programs
+              </motion.a>
+              <motion.a
+                href="/signup"
+                whileHover={{ scale: 1.05 }}
+                className="inline-block border border-[#3B82F6] text-[#3B82F6] bg-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-blue-50 transition focus:outline-none focus:ring-2 focus:ring-blue-200 focus:ring-offset-2"
+              >
+                Register as Provider
+              </motion.a>
+            </div>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
+            className="flex-1 flex justify-center items-center mt-10 md:mt-0"
+          >
+            <img
+              src="/illustration.svg"
+              alt="Learning illustration"
+              className="max-w-full h-auto md:max-w-md lg:max-w-lg drop-shadow-xl"
+            />
+          </motion.div>
         </div>
       </section>
 
