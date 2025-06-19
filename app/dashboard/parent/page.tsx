@@ -1,3 +1,4 @@
+"use client";
 import FindPrograms from "./components/FindPrograms";
 import ApplicationTracker from "./components/ApplicationTracker";
 import { motion } from "framer-motion";
