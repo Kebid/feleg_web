@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 const mockPrograms = [
   {
@@ -79,80 +80,90 @@ export default function FindPrograms() {
   return (
     <div className="max-w-5xl mx-auto p-0">
       {/* Filter/Search Panel */}
-      <form
+      <motion.form
         onSubmit={handleSearch}
-        className="bg-blue-50 rounded shadow p-4 mb-6 flex flex-col md:flex-row md:items-end gap-4 border border-blue-100"
+        className="bg-blue-50 rounded-2xl shadow p-4 mb-6 flex flex-col md:flex-row md:items-end gap-4 border-2 border-blue-200"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
       >
-        <input
+        <motion.input
           type="text"
           name="keyword"
           placeholder="Search by keyword"
           value={filters.keyword}
           onChange={handleChange}
-          className="border p-2 rounded flex-1 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="border-2 border-blue-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 rounded-lg flex-1 p-2 transition-all duration-200 shadow-sm focus:scale-[1.03] focus:shadow-md bg-white"
+          whileFocus={{ scale: 1.03, boxShadow: '0 2px 12px 0 #3B82F655' }}
         />
-        <select
+        <motion.select
           name="location"
           value={filters.location}
           onChange={handleChange}
-          className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="border-2 border-blue-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 rounded-lg p-2 transition-all duration-200 shadow-sm focus:scale-[1.03] focus:shadow-md bg-white"
+          whileFocus={{ scale: 1.03, boxShadow: '0 2px 12px 0 #3B82F655' }}
         >
           <option value="">Location</option>
           {locations.map((loc) => (
             <option key={loc} value={loc}>{loc}</option>
           ))}
-        </select>
-        <select
+        </motion.select>
+        <motion.select
           name="type"
           value={filters.type}
           onChange={handleChange}
-          className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="border-2 border-blue-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 rounded-lg p-2 transition-all duration-200 shadow-sm focus:scale-[1.03] focus:shadow-md bg-white"
+          whileFocus={{ scale: 1.03, boxShadow: '0 2px 12px 0 #3B82F655' }}
         >
           <option value="">Program Type</option>
           {programTypes.map((type) => (
             <option key={type} value={type}>{type}</option>
           ))}
-        </select>
-        <select
+        </motion.select>
+        <motion.select
           name="delivery"
           value={filters.delivery}
           onChange={handleChange}
-          className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="border-2 border-blue-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 rounded-lg p-2 transition-all duration-200 shadow-sm focus:scale-[1.03] focus:shadow-md bg-white"
+          whileFocus={{ scale: 1.03, boxShadow: '0 2px 12px 0 #3B82F655' }}
         >
           <option value="">Delivery Mode</option>
           {deliveryModes.map((mode) => (
             <option key={mode} value={mode}>{mode}</option>
           ))}
-        </select>
-        <select
+        </motion.select>
+        <motion.select
           name="ageGroup"
           value={filters.ageGroup}
           onChange={handleChange}
-          className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="border-2 border-blue-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 rounded-lg p-2 transition-all duration-200 shadow-sm focus:scale-[1.03] focus:shadow-md bg-white"
+          whileFocus={{ scale: 1.03, boxShadow: '0 2px 12px 0 #3B82F655' }}
         >
           <option value="">Age Group</option>
           {ageGroups.map((age) => (
             <option key={age} value={age}>{age}</option>
           ))}
-        </select>
-        <select
+        </motion.select>
+        <motion.select
           name="cost"
           value={filters.cost}
           onChange={handleChange}
-          className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="border-2 border-blue-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-200 rounded-lg p-2 transition-all duration-200 shadow-sm focus:scale-[1.03] focus:shadow-md bg-white"
+          whileFocus={{ scale: 1.03, boxShadow: '0 2px 12px 0 #3B82F655' }}
         >
           <option value="">Cost</option>
           {costRanges.map((cost) => (
             <option key={cost} value={cost}>{cost}</option>
           ))}
-        </select>
-        <button
+        </motion.select>
+        <motion.button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+          whileHover={{ scale: 1.05 }}
+          className="bg-[#3B82F6] text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 border-2 border-blue-400"
         >
           Search
-        </button>
-      </form>
+        </motion.button>
+      </motion.form>
 
       {/* Results Section */}
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
