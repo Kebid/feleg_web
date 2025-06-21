@@ -1,38 +1,7 @@
- "use client";
+"use client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-
-// Mock data for applications
-const initialApplications = [
-  {
-    id: 1,
-    programTitle: "STEM Summer Camp",
-    applicantName: "Sarah Johnson",
-    childName: "Alex Johnson",
-    childAge: 10,
-    status: "Pending",
-    submissionDate: "2024-06-10",
-  },
-  {
-    id: 2,
-    programTitle: "Art for Kids",
-    applicantName: "James Lee",
-    childName: "Samantha Lee",
-    childAge: 8,
-    status: "Accepted",
-    submissionDate: "2024-06-12",
-  },
-  {
-    id: 3,
-    programTitle: "Soccer Stars",
-    applicantName: "Priya Singh",
-    childName: "Rohan Singh",
-    childAge: 12,
-    status: "Rejected",
-    submissionDate: "2024-06-15",
-  },
-  // Add more mock applications as needed
-];
+import { supabase } from "@/utils/supabaseClient";
 
 function statusColor(status: string) {
   if (status === "Accepted") return "text-green-600 bg-green-100";
@@ -44,33 +13,122 @@ function statusColor(status: string) {
 export default function Applications() {
   const [applications, setApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [programFilter, setProgramFilter] = useState("");
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    // Simulate async fetch
-    setTimeout(() => {
-      setApplications(initialApplications);
-      setLoading(false);
-    }, 800);
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUser(data?.user || null);
+    };
+    getUser();
   }, []);
 
-  const handleAction = (id: number, action: "Accepted" | "Rejected") => {
-    setApplications((prev) =>
-      prev.map((app) =>
-        app.id === id ? { ...app, status: action } : app
-      )
-    );
+  useEffect(() => {
+    if (!user) return;
+    
+    const fetchApplications = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        
+        // Fetch applications for programs owned by the current provider
+        const { data, error: fetchError } = await supabase
+          .from("applications")
+          .select(`
+            id,
+            child_name,
+            child_age,
+            interests,
+            status,
+            submitted_at,
+            programs (
+              id,
+              title
+            )
+          `)
+          .in('program_id', 
+            supabase
+              .from('programs')
+              .select('id')
+              .eq('provider_id', user.id)
+          )
+          .order("submitted_at", { ascending: false });
+
+        if (fetchError) {
+          console.error("Error fetching applications:", fetchError);
+          setError("Failed to load applications");
+        } else {
+          setApplications(data || []);
+        }
+      } catch (error) {
+        console.error("Unexpected error:", error);
+        setError("An unexpected error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApplications();
+  }, [user]);
+
+  const handleAction = async (id: string, action: "Accepted" | "Rejected") => {
+    try {
+      const { error } = await supabase
+        .from("applications")
+        .update({ status: action })
+        .eq("id", id);
+
+      if (error) {
+        console.error("Error updating application:", error);
+        alert("Failed to update application status");
+      } else {
+        // Update local state
+        setApplications((prev) =>
+          prev.map((app) =>
+            app.id === id ? { ...app, status: action } : app
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      alert("An unexpected error occurred");
+    }
   };
 
   // Get unique program titles for filter dropdown
-  const programTitles = Array.from(new Set(applications.map((a) => a.programTitle)));
+  const programTitles = Array.from(new Set(applications.map((a) => a.programs?.title).filter(Boolean)));
 
   // Filtered applications
   const filteredApps = applications.filter((app) =>
     (statusFilter ? app.status === statusFilter : true) &&
-    (programFilter ? app.programTitle === programFilter : true)
+    (programFilter ? app.programs?.title === programFilter : true)
   );
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mb-4"></div>
+        <div className="text-gray-500">Loading applications...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-red-500 mb-2">{error}</div>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="text-green-600 hover:underline"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -79,12 +137,13 @@ export default function Applications() {
       transition={{ duration: 0.5 }}
     >
       <h2 className="text-xl font-bold mb-6 text-green-700">All Applications</h2>
+      
       {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-4">
+      <div className="flex flex-wrap gap-4 mb-6">
         <select
           value={programFilter}
           onChange={e => setProgramFilter(e.target.value)}
-          className="border border-green-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+          className="border border-green-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200 bg-white"
         >
           <option value="">All Programs</option>
           {programTitles.map(title => (
@@ -94,7 +153,7 @@ export default function Applications() {
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          className="border border-green-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200"
+          className="border border-green-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-200 bg-white"
         >
           <option value="">All Statuses</option>
           <option value="Pending">Pending</option>
@@ -102,49 +161,59 @@ export default function Applications() {
           <option value="Rejected">Rejected</option>
         </select>
       </div>
-      {loading ? (
-        <div className="text-center py-8 text-gray-500">Loading applications...</div>
-      ) : filteredApps.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">No applications found.</div>
+
+      {filteredApps.length === 0 ? (
+        <div className="text-center py-8">
+          <div className="text-gray-500 mb-2">
+            {applications.length === 0 ? "No applications found." : "No applications match your filters."}
+          </div>
+          {applications.length === 0 && (
+            <div className="text-sm text-gray-400">
+              Applications will appear here once parents apply to your programs.
+            </div>
+          )}
+        </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white rounded shadow">
+          <table className="min-w-full bg-white rounded-lg shadow">
             <thead>
-              <tr>
-                <th className="px-4 py-2 text-left">Program</th>
-                <th className="px-4 py-2 text-left">Applicant</th>
-                <th className="px-4 py-2 text-left">Child</th>
-                <th className="px-4 py-2 text-left">Age</th>
-                <th className="px-4 py-2 text-left">Status</th>
-                <th className="px-4 py-2 text-left">Submitted</th>
-                <th className="px-4 py-2 text-left">Actions</th>
+              <tr className="border-b border-gray-200">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Program</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Child Name</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Age</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Submitted</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredApps.map((app) => (
-                <tr key={app.id} className="border-t">
-                  <td className="px-4 py-2 font-semibold">{app.programTitle}</td>
-                  <td className="px-4 py-2">{app.applicantName}</td>
-                  <td className="px-4 py-2">{app.childName}</td>
-                  <td className="px-4 py-2">{app.childAge}</td>
-                  <td className="px-4 py-2">
+                <tr key={app.id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="px-4 py-3 font-semibold text-gray-900">
+                    {app.programs?.title || "Unknown Program"}
+                  </td>
+                  <td className="px-4 py-3 text-gray-700">{app.child_name}</td>
+                  <td className="px-4 py-3 text-gray-700">{app.child_age}</td>
+                  <td className="px-4 py-3">
                     <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColor(app.status)}`}>
                       {app.status}
                     </span>
                   </td>
-                  <td className="px-4 py-2">{app.submissionDate}</td>
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-3 text-gray-700">
+                    {new Date(app.submitted_at).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-3">
                     {app.status === "Pending" && (
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleAction(app.id, "Accepted")}
-                          className="px-3 py-1 rounded bg-green-500 text-white text-sm font-semibold hover:bg-green-600 transition"
+                          className="px-3 py-1 rounded bg-green-500 text-white text-sm font-semibold hover:bg-green-600 transition-colors"
                         >
                           Accept
                         </button>
                         <button
                           onClick={() => handleAction(app.id, "Rejected")}
-                          className="px-3 py-1 rounded bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition"
+                          className="px-3 py-1 rounded bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors"
                         >
                           Reject
                         </button>
