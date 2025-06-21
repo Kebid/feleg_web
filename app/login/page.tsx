@@ -4,6 +4,7 @@ import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 
 const inputVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -16,7 +17,6 @@ export default function LoginPage() {
     password: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState("parent");
   const router = useRouter();
@@ -28,17 +28,18 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    
     // Login user
     const { data, error: loginError } = await supabase.auth.signInWithPassword({
       email: form.email,
       password: form.password,
     });
     if (loginError || !data.user) {
-      setError(loginError?.message || "Login failed");
+      toast.error(loginError?.message || "Login failed");
       setLoading(false);
       return;
     }
+    
     // Fetch profile
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
@@ -46,17 +47,20 @@ export default function LoginPage() {
       .eq("id", data.user.id)
       .maybeSingle();
     if (profileError || !profile) {
-      setError(profileError?.message || "Profile not found");
+      toast.error(profileError?.message || "Profile not found");
       setLoading(false);
       return;
     }
+    
     // Redirect based on role
     if (profile.role === "parent") {
+      toast.success("Welcome back!");
       router.push("/dashboard/parent");
     } else if (profile.role === "provider") {
+      toast.success("Welcome back!");
       router.push("/dashboard/provider");
     } else {
-      setError("Unknown role");
+      toast.error("Unknown role");
     }
     setLoading(false);
   };
@@ -72,15 +76,6 @@ export default function LoginPage() {
           className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-4 md:p-8"
         >
           <h2 className="text-2xl font-bold text-center text-[#111827] mb-6">Welcome Back</h2>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-red-100 text-red-700 p-2 rounded text-center text-sm mb-2 border border-red-200"
-            >
-              {error}
-            </motion.div>
-          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <motion.div custom={0} variants={inputVariants} initial="hidden" animate="visible">
               <label htmlFor="email" className="block text-sm font-medium text-[#111827] mb-1">

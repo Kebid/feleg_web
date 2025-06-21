@@ -8,7 +8,7 @@ export default function ParentDashboard() {
   const userName = "Parent User";
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] p-4 md:p-8">
+    <div className="min-h-screen bg-[#F9FAFB]">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}

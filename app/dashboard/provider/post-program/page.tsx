@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/utils/supabaseClient";
+import toast from "react-hot-toast";
 
 const programTypes = ["STEM", "Arts", "Sports", "Other"];
 const deliveryModes = ["Online", "In-Person"];
@@ -21,7 +22,6 @@ export default function PostProgramPage() {
     media: null as File | null,
   });
   const [errors, setErrors] = useState<any>({});
-  const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -56,13 +56,13 @@ export default function PostProgramPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    setSuccess(false);
     const errs = validate();
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
       return;
     }
     setSubmitting(true);
+    
     // Insert into Supabase
     const { error } = await supabase.from("programs").insert({
       title: form.title,
@@ -75,12 +75,14 @@ export default function PostProgramPage() {
       cost: form.cost,
       provider_id: userId,
     });
+    
     if (error) {
-      setErrors({ submit: error.message });
+      toast.error(error.message || "Failed to post program");
       setSubmitting(false);
       return;
     }
-    setSuccess(true);
+    
+    toast.success("Program posted successfully!");
     setForm({
       title: "",
       description: "",
@@ -103,9 +105,6 @@ export default function PostProgramPage() {
       </div>
       <div className="bg-white rounded shadow p-6">
         <h1 className="text-2xl font-bold mb-4">Post a New Program</h1>
-        {success && (
-          <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">Program posted successfully!</div>
-        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block font-semibold mb-1">Program Title *</label>
@@ -224,17 +223,20 @@ export default function PostProgramPage() {
               type="file"
               name="media"
               onChange={handleChange}
-              className="w-full"
-              accept="image/*,video/*"
+              className="w-full border p-2 rounded"
+              accept="image/*"
             />
-            {form.media && <div className="text-sm text-gray-600 mt-1">Selected: {form.media.name}</div>}
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+            className={`w-full py-2 px-4 rounded font-semibold ${
+              submitting
+                ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
             disabled={submitting}
           >
-            {submitting ? "Submitting..." : "Post Program"}
+            {submitting ? "Posting..." : "Post Program"}
           </button>
         </form>
       </div>

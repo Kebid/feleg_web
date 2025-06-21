@@ -34,7 +34,28 @@ export default function Applications() {
         setLoading(true);
         setError("");
         
-        // Fetch applications for programs owned by the current provider
+        // First, get the program IDs for this provider
+        const { data: programs, error: programsError } = await supabase
+          .from('programs')
+          .select('id')
+          .eq('provider_id', user.id);
+
+        if (programsError) {
+          console.error("Error fetching programs:", programsError);
+          setError("Failed to load programs");
+          setLoading(false);
+          return;
+        }
+
+        if (!programs || programs.length === 0) {
+          setApplications([]);
+          setLoading(false);
+          return;
+        }
+
+        const programIds = programs.map(p => p.id);
+        
+        // Then fetch applications for those programs
         const { data, error: fetchError } = await supabase
           .from("applications")
           .select(`
@@ -49,12 +70,7 @@ export default function Applications() {
               title
             )
           `)
-          .in('program_id', 
-            supabase
-              .from('programs')
-              .select('id')
-              .eq('provider_id', user.id)
-          )
+          .in('program_id', programIds)
           .order("submitted_at", { ascending: false });
 
         if (fetchError) {

@@ -16,7 +16,7 @@ export default function ProviderDashboard() {
   const userName = "Provider User";
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] p-4 md:p-8">
+    <div className="min-h-screen bg-[#F9FAFB]">
       <div className="max-w-5xl mx-auto mb-8">
         <h1 className="text-3xl md:text-4xl font-extrabold text-[#166534] mb-2">
           Welcome, {userName}!

@@ -29,7 +29,7 @@ export default function Home() {
   return (
     <main className="bg-[#F9FAFB] min-h-screen flex flex-col justify-between">
       {/* Hero Section */}
-      <section className="bg-[#F9FAFB] py-12 px-4 flex justify-center">
+      <section className="bg-[#F9FAFB] py-12 flex justify-center">
         <div className="w-full max-w-6xl rounded-3xl bg-[#F9FAFB] p-6 md:p-12 flex flex-col md:flex-row items-center shadow-none">
           <motion.div
             initial={{ opacity: 0, x: -40 }}
@@ -76,7 +76,7 @@ export default function Home() {
       </section>
 
       {/* Featured Benefits Section */}
-      <section className="py-16 px-4 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <section className="py-16 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center text-center reveal opacity-0 translate-y-8 transition-all duration-700">
           <div className="mb-4 text-[#3B82F6] text-3xl">📈</div>
           <h3 className="font-bold text-lg text-[#111827] mb-2">Easy Application Tracking</h3>
@@ -100,7 +100,7 @@ export default function Home() {
       </section>
 
       {/* Testimonials Section (optional) */}
-      <section className="py-12 px-4 max-w-4xl mx-auto">
+      <section className="py-12 max-w-4xl mx-auto">
         <h2 className="text-2xl font-bold text-center text-[#111827] mb-8 reveal opacity-0 translate-y-8 transition-all duration-700">What Parents Are Saying</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white rounded-lg shadow p-6 reveal opacity-0 translate-y-8 transition-all duration-700">
@@ -120,7 +120,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 py-6 mt-8">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center px-4">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center">
           <div className="text-[#111827] font-bold text-lg mb-4 md:mb-0">Enrichment Finder</div>
           <nav className="flex gap-6 text-[#3B82F6] text-sm">
             <Link href="#"><span className="hover:underline">About</span></Link>

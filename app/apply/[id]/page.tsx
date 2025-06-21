@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/utils/supabaseClient";
+import toast from "react-hot-toast";
 
 const mockPrograms = [
   {
@@ -32,7 +33,6 @@ export default function ApplyPage() {
     document: null as File | null,
   });
   const [errors, setErrors] = useState<any>({});
-  const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -41,15 +41,15 @@ export default function ApplyPage() {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
           console.error("Auth error:", error);
-          setErrors({ auth: "Authentication error. Please try logging in again." });
+          toast.error("Authentication error. Please try logging in again.");
         } else if (!session?.user) {
-          setErrors({ auth: "You must be logged in to apply for programs." });
+          toast.error("You must be logged in to apply for programs.");
         } else {
           setUser(session.user);
         }
       } catch (error) {
         console.error("Auth check failed:", error);
-        setErrors({ auth: "Failed to verify authentication." });
+        toast.error("Failed to verify authentication.");
       } finally {
         setLoading(false);
       }
@@ -83,11 +83,10 @@ export default function ApplyPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    setSuccess(false);
     
     // Check if user is authenticated
     if (!user) {
-      setErrors({ auth: "You must be logged in to apply for programs." });
+      toast.error("You must be logged in to apply for programs.");
       return;
     }
 
@@ -117,9 +116,9 @@ export default function ApplyPage() {
 
       if (error) {
         console.error("Application submission error:", error);
-        setErrors({ submit: error.message || "Failed to submit application. Please try again." });
+        toast.error(error.message || "Failed to submit application. Please try again.");
       } else {
-        setSuccess(true);
+        toast.success("Application submitted successfully!");
         setForm({ childName: "", childAge: "", interests: "", document: null });
         
         // Redirect to parent dashboard after 2 seconds
@@ -129,7 +128,7 @@ export default function ApplyPage() {
       }
     } catch (error) {
       console.error("Unexpected error:", error);
-      setErrors({ submit: "An unexpected error occurred. Please try again." });
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -160,60 +159,6 @@ export default function ApplyPage() {
       </div>
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-2xl font-bold mb-4 text-gray-800">Apply to {program.title}</h1>
-        
-        {/* Authentication Error */}
-        {errors.auth && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-red-700">{errors.auth}</p>
-                <div className="mt-2">
-                  <Link href="/login" className="text-sm font-medium text-red-600 hover:text-red-500">
-                    Login here
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Success Message */}
-        {success && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-green-700 font-medium">Application submitted successfully!</p>
-                <p className="text-sm text-green-600 mt-1">Redirecting to dashboard...</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Submit Error */}
-        {errors.submit && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-red-700">{errors.submit}</p>
-              </div>
-            </div>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

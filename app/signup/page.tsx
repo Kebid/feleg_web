@@ -4,6 +4,7 @@ import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 
 const inputVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -18,8 +19,6 @@ export default function SignupPage() {
     role: "parent",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
@@ -30,8 +29,7 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
-    setSuccess("");
+    
     // Sign up user
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: form.email,
@@ -41,10 +39,11 @@ export default function SignupPage() {
       },
     });
     if (signUpError || !data.user) {
-      setError(signUpError?.message || "Signup failed");
+      toast.error(signUpError?.message || "Signup failed");
       setLoading(false);
       return;
     }
+    
     // Insert profile
     const { error: profileError } = await supabase.from("profiles").insert({
       id: data.user.id,
@@ -53,11 +52,12 @@ export default function SignupPage() {
       role: form.role,
     });
     if (profileError) {
-      setError(profileError.message);
+      toast.error(profileError.message);
       setLoading(false);
       return;
     }
-    setSuccess("Signup successful! Please check your email to verify your account.");
+    
+    toast.success("Signup successful! Please check your email to verify your account.");
     setLoading(false);
   };
 
@@ -72,24 +72,6 @@ export default function SignupPage() {
           className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-4 md:p-8"
         >
           <h2 className="text-2xl font-bold text-center text-[#111827] mb-6">Create Your Account</h2>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-red-100 text-red-700 p-2 rounded text-center text-sm mb-2 border border-red-200"
-            >
-              {error}
-            </motion.div>
-          )}
-          {success && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-green-100 text-green-700 p-2 rounded text-center text-sm mb-2 border border-green-200"
-            >
-              {success}
-            </motion.div>
-          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <motion.div custom={0} variants={inputVariants} initial="hidden" animate="visible">
               <label htmlFor="name" className="block text-sm font-medium text-[#111827] mb-1">
