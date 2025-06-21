@@ -30,35 +30,67 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     
-    // Sign up user
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email: form.email,
-      password: form.password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/login`,
-      },
-    });
-    if (signUpError || !data.user) {
-      toast.error(signUpError?.message || "Signup failed");
+    try {
+      // Step 1: Sign up the user
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: form.email,
+        password: form.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/login`,
+        },
+      });
+
+      if (signUpError || !data.user) {
+        toast.error(signUpError?.message || "Signup failed");
+        return;
+      }
+
+      // Step 2: Check if email confirmation is required
+      if (data.session) {
+        // User is immediately signed in (no email confirmation required)
+        console.log("User signed in immediately");
+        
+        // Step 3: Insert the profile with the authenticated user's ID
+        const { error: profileError } = await supabase.from("profiles").insert({
+          id: data.user.id,
+          name: form.name,
+          email: form.email,
+          role: form.role,
+        });
+
+        if (profileError) {
+          console.error("Profile insert error:", profileError);
+          toast.error(`Failed to create profile: ${profileError.message}`);
+          return;
+        }
+
+        // Step 4: Success! Show message and redirect
+        toast.success("Account created successfully!");
+        
+        // Redirect based on role
+        if (form.role === "parent") {
+          router.push("/dashboard/parent");
+        } else {
+          router.push("/dashboard/provider");
+        }
+      } else {
+        // Email confirmation is required
+        console.log("Email confirmation required");
+        
+        // For email confirmation, we need to handle profile creation differently
+        // The profile will be created when the user confirms their email and logs in
+        toast.success("Account created! Please check your email to verify your account before logging in.");
+        
+        // Redirect to login page
+        router.push("/login");
+      }
+
+    } catch (error) {
+      console.error("Unexpected error during signup:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-    
-    // Insert profile
-    const { error: profileError } = await supabase.from("profiles").insert({
-      id: data.user.id,
-      name: form.name,
-      email: form.email,
-      role: form.role,
-    });
-    if (profileError) {
-      toast.error(profileError.message);
-      setLoading(false);
-      return;
-    }
-    
-    toast.success("Signup successful! Please check your email to verify your account.");
-    setLoading(false);
   };
 
   return (
@@ -86,6 +118,7 @@ export default function SignupPage() {
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
                 required
+                disabled={loading}
               />
             </motion.div>
             <motion.div custom={1} variants={inputVariants} initial="hidden" animate="visible">
@@ -101,6 +134,7 @@ export default function SignupPage() {
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
                 required
+                disabled={loading}
               />
             </motion.div>
             <motion.div custom={2} variants={inputVariants} initial="hidden" animate="visible">
@@ -117,6 +151,7 @@ export default function SignupPage() {
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
                   required
+                  disabled={loading}
                 />
                 <button
                   type="button"
@@ -124,6 +159,7 @@ export default function SignupPage() {
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 text-sm"
                   tabIndex={-1}
                   aria-label={showPassword ? "Hide password" : "Show password"}
+                  disabled={loading}
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -139,6 +175,7 @@ export default function SignupPage() {
                 value={form.role}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+                disabled={loading}
               >
                 <option value="parent">Parent</option>
                 <option value="provider">Provider</option>
@@ -146,15 +183,22 @@ export default function SignupPage() {
             </motion.div>
             <motion.button
               type="submit"
-              whileHover={{ scale: 1.03 }}
-              className="w-full bg-[#3B82F6] text-white py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 mt-2"
+              whileHover={{ scale: loading ? 1 : 1.03 }}
+              className={`w-full py-2 rounded-lg font-semibold shadow transition focus:outline-none focus:ring-2 focus:ring-offset-2 mt-2 ${
+                loading
+                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                  : "bg-[#3B82F6] text-white hover:bg-blue-700 focus:ring-blue-300"
+              }`}
               disabled={loading}
             >
               {loading ? (
-                <svg className="animate-spin h-5 w-5 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                </svg>
+                <div className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating Account...
+                </div>
               ) : (
                 "Sign Up"
               )}

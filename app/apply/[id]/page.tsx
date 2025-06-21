@@ -5,21 +5,6 @@ import Link from "next/link";
 import { supabase } from "@/utils/supabaseClient";
 import toast from "react-hot-toast";
 
-const mockPrograms = [
-  {
-    id: "1",
-    title: "STEM Summer Camp",
-  },
-  {
-    id: "2",
-    title: "Art for Kids",
-  },
-  {
-    id: "3",
-    title: "Soccer Stars",
-  },
-];
-
 export default function ApplyPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -59,8 +44,34 @@ export default function ApplyPage() {
   }, []);
 
   useEffect(() => {
-    const found = mockPrograms.find((p) => p.id === id);
-    setProgram(found);
+    const fetchProgram = async () => {
+      if (!id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from("programs")
+          .select("*")
+          .eq("id", id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching program:", error);
+          if (error.code === "PGRST116") {
+            // No rows returned
+            setProgram(null);
+          } else {
+            toast.error("Failed to load program details");
+          }
+        } else {
+          setProgram(data);
+        }
+      } catch (error) {
+        console.error("Unexpected error:", error);
+        toast.error("An unexpected error occurred");
+      }
+    };
+
+    fetchProgram();
   }, [id]);
 
   const validate = () => {
@@ -159,6 +170,17 @@ export default function ApplyPage() {
       </div>
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-2xl font-bold mb-4 text-gray-800">Apply to {program.title}</h1>
+        
+        {/* Program Summary */}
+        <div className="bg-blue-50 rounded-lg p-4 mb-6">
+          <h3 className="font-semibold text-blue-800 mb-2">Program Details:</h3>
+          <div className="text-sm text-gray-700 space-y-1">
+            <div><span className="font-medium">Type:</span> {program.program_type}</div>
+            <div><span className="font-medium">Location:</span> {program.location}</div>
+            <div><span className="font-medium">Age Group:</span> {program.age_group}</div>
+            <div><span className="font-medium">Cost:</span> {program.cost}</div>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

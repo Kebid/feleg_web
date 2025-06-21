@@ -1,46 +1,14 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-
-const mockPrograms = [
-  {
-    id: 1,
-    title: "STEM Summer Camp",
-    type: "STEM",
-    location: "New York",
-    ageGroup: "8-12",
-    cost: "Paid",
-    delivery: "In-Person",
-  },
-  {
-    id: 2,
-    title: "Art for Kids",
-    type: "Arts",
-    location: "Los Angeles",
-    ageGroup: "6-10",
-    cost: "Free",
-    delivery: "Online",
-  },
-  {
-    id: 3,
-    title: "Soccer Stars",
-    type: "Sports",
-    location: "Chicago",
-    ageGroup: "10-14",
-    cost: "Paid",
-    delivery: "In-Person",
-  },
-  // Add more mock programs as needed
-];
-
-const locations = ["New York", "Los Angeles", "Chicago"];
-const programTypes = ["STEM", "Arts", "Sports"];
-const deliveryModes = ["Online", "In-Person"];
-const ageGroups = ["6-10", "8-12", "10-14"];
-const costRanges = ["Free", "Paid"];
+import { supabase } from "@/utils/supabaseClient";
+import toast from "react-hot-toast";
 
 export default function FindPrograms() {
+  const [programs, setPrograms] = useState<any[]>([]);
+  const [filteredPrograms, setFilteredPrograms] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     keyword: "",
     location: "",
@@ -49,8 +17,42 @@ export default function FindPrograms() {
     ageGroup: "",
     cost: "",
   });
-  const [results, setResults] = useState(mockPrograms);
   const [bookmarks, setBookmarks] = useState<number[]>([]);
+
+  // Fetch programs from database
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("programs")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching programs:", error);
+          toast.error("Failed to load programs");
+        } else {
+          setPrograms(data || []);
+          setFilteredPrograms(data || []);
+        }
+      } catch (error) {
+        console.error("Unexpected error:", error);
+        toast.error("An unexpected error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPrograms();
+  }, []);
+
+  // Get unique values for filter dropdowns
+  const locations = Array.from(new Set(programs.map(p => p.location).filter(Boolean)));
+  const programTypes = Array.from(new Set(programs.map(p => p.program_type).filter(Boolean)));
+  const deliveryModes = Array.from(new Set(programs.map(p => p.delivery_mode).filter(Boolean)));
+  const ageGroups = Array.from(new Set(programs.map(p => p.age_group).filter(Boolean)));
+  const costRanges = Array.from(new Set(programs.map(p => p.cost).filter(Boolean)));
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -58,17 +60,17 @@ export default function FindPrograms() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    let filtered = mockPrograms.filter((p) => {
+    let filtered = programs.filter((p) => {
       return (
         (!filters.keyword || p.title.toLowerCase().includes(filters.keyword.toLowerCase())) &&
         (!filters.location || p.location === filters.location) &&
-        (!filters.type || p.type === filters.type) &&
-        (!filters.delivery || p.delivery === filters.delivery) &&
-        (!filters.ageGroup || p.ageGroup === filters.ageGroup) &&
+        (!filters.type || p.program_type === filters.type) &&
+        (!filters.delivery || p.delivery_mode === filters.delivery) &&
+        (!filters.ageGroup || p.age_group === filters.ageGroup) &&
         (!filters.cost || p.cost === filters.cost)
       );
     });
-    setResults(filtered);
+    setFilteredPrograms(filtered);
   };
 
   const toggleBookmark = (id: number) => {
@@ -76,6 +78,17 @@ export default function FindPrograms() {
       prev.includes(id) ? prev.filter((b) => b !== id) : [...prev, id]
     );
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-5xl mx-auto p-0">
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+          <div className="text-gray-500">Loading programs...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto p-0">
@@ -167,13 +180,15 @@ export default function FindPrograms() {
 
       {/* Results Section */}
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {results.length === 0 && (
+        {filteredPrograms.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center py-12">
             <span className="text-5xl text-blue-200 mb-2">🔍</span>
-            <div className="text-center text-gray-500 font-medium">No programs found.<br/>Try adjusting your filters.</div>
+            <div className="text-center text-gray-500 font-medium">
+              {programs.length === 0 ? "No programs available yet." : "No programs found.<br/>Try adjusting your filters."}
+            </div>
           </div>
         )}
-        {results.map((program) => (
+        {filteredPrograms.map((program) => (
           <div key={program.id} className="bg-white rounded-xl shadow-lg p-5 flex flex-col relative border border-blue-100 hover:shadow-xl transition-shadow">
             <button
               className={`absolute top-2 right-2 text-xl ${bookmarks.includes(program.id) ? "text-red-500" : "text-gray-300"} transition-colors`}
@@ -184,11 +199,16 @@ export default function FindPrograms() {
               {bookmarks.includes(program.id) ? "♥" : "♡"}
             </button>
             <h3 className="text-lg font-bold mb-2 text-blue-800">{program.title}</h3>
-            <div className="mb-1"><span className="font-semibold">Type:</span> {program.type}</div>
+            <div className="mb-1"><span className="font-semibold">Type:</span> {program.program_type}</div>
             <div className="mb-1"><span className="font-semibold">Location:</span> {program.location}</div>
-            <div className="mb-1"><span className="font-semibold">Age Group:</span> {program.ageGroup}</div>
+            <div className="mb-1"><span className="font-semibold">Age Group:</span> {program.age_group}</div>
             <div className="mb-1"><span className="font-semibold">Cost:</span> {program.cost}</div>
-            <div className="mb-1"><span className="font-semibold">Delivery:</span> {program.delivery}</div>
+            <div className="mb-1"><span className="font-semibold">Delivery:</span> {program.delivery_mode}</div>
+            {program.description && (
+              <div className="mb-2 text-sm text-gray-600 line-clamp-2">
+                {program.description}
+              </div>
+            )}
             <Link
               href={`/programs/${program.id}`}
               className="mt-4 bg-blue-600 text-white px-3 py-2 rounded text-center hover:bg-blue-700 transition-colors font-semibold shadow-sm"

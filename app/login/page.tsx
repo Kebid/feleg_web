@@ -29,40 +29,70 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     
-    // Login user
-    const { data, error: loginError } = await supabase.auth.signInWithPassword({
-      email: form.email,
-      password: form.password,
-    });
-    if (loginError || !data.user) {
-      toast.error(loginError?.message || "Login failed");
+    try {
+      // Login user
+      const { data, error: loginError } = await supabase.auth.signInWithPassword({
+        email: form.email,
+        password: form.password,
+      });
+      if (loginError || !data.user) {
+        toast.error(loginError?.message || "Login failed");
+        return;
+      }
+      
+      // Fetch profile
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .maybeSingle();
+      
+      if (profileError) {
+        console.error("Profile fetch error:", profileError);
+        toast.error("Failed to load profile");
+        return;
+      }
+      
+      if (!profile) {
+        // Profile doesn't exist, create one
+        console.log("Creating profile for user:", data.user.id);
+        const { error: insertError } = await supabase.from("profiles").insert({
+          id: data.user.id,
+          name: data.user.email?.split('@')[0] || 'New User',
+          email: data.user.email || '',
+          role: role, // Use the role selected in the form
+        });
+        
+        if (insertError) {
+          console.error("Profile creation error:", insertError);
+          toast.error("Failed to create profile");
+          return;
+        }
+        
+        // Redirect based on selected role
+        toast.success("Welcome! Your profile has been created.");
+        if (role === "parent") {
+          router.push("/dashboard/parent");
+        } else {
+          router.push("/dashboard/provider");
+        }
+      } else {
+        // Profile exists, redirect based on stored role
+        toast.success("Welcome back!");
+        if (profile.role === "parent") {
+          router.push("/dashboard/parent");
+        } else if (profile.role === "provider") {
+          router.push("/dashboard/provider");
+        } else {
+          toast.error("Unknown role");
+        }
+      }
+    } catch (error) {
+      console.error("Unexpected error during login:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-    
-    // Fetch profile
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", data.user.id)
-      .maybeSingle();
-    if (profileError || !profile) {
-      toast.error(profileError?.message || "Profile not found");
-      setLoading(false);
-      return;
-    }
-    
-    // Redirect based on role
-    if (profile.role === "parent") {
-      toast.success("Welcome back!");
-      router.push("/dashboard/parent");
-    } else if (profile.role === "provider") {
-      toast.success("Welcome back!");
-      router.push("/dashboard/provider");
-    } else {
-      toast.error("Unknown role");
-    }
-    setLoading(false);
   };
 
   return (
@@ -118,6 +148,11 @@ export default function LoginPage() {
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
+              </div>
+              <div className="text-right mt-1">
+                <Link href="/forgot-password" className="text-sm text-[#3B82F6] hover:underline">
+                  Forgot password?
+                </Link>
               </div>
             </motion.div>
             <motion.div custom={2} variants={inputVariants} initial="hidden" animate="visible">
