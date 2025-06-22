@@ -17,7 +17,7 @@ interface Application {
   interests: string;
   status: string;
   submitted_at: string;
-  programs: {
+  program: {
     title: string;
     description: string;
     program_type: string;
@@ -31,7 +31,7 @@ interface Application {
     contact_email: string;
     website: string;
     provider_id: string;
-  };
+  } | null;
 }
 
 export default function ApplicationTracker() {
@@ -62,7 +62,7 @@ export default function ApplicationTracker() {
             interests,
             status,
             submitted_at,
-            programs (
+            program:program_id (
               title,
               description,
               program_type,
@@ -84,8 +84,15 @@ export default function ApplicationTracker() {
         if (fetchError) {
           console.error("Error fetching applications:", fetchError);
           setError("Failed to load applications");
+        } else if (data && Array.isArray(data)) {
+          // Unwrap program array if needed
+          const fixed = data.map(app => ({
+            ...app,
+            program: Array.isArray(app.program) ? app.program[0] || null : app.program,
+          }));
+          setApplications(fixed);
         } else {
-          setApplications(data || []);
+          setApplications([]);
         }
 
         // Fetch unread notifications count
@@ -196,7 +203,7 @@ export default function ApplicationTracker() {
             {applications.map((app) => (
               <tr key={app.id} className="border-b border-gray-100 hover:bg-gray-50">
                 <td className="px-4 py-3 font-medium text-gray-900">
-                  {app.programs?.title || "Unknown Program"}
+                  {app.program?.title || "Unknown Program"}
                 </td>
                 <td className="px-4 py-3 text-gray-700">{app.child_name}</td>
                 <td className="px-4 py-3 text-gray-700">{app.child_age}</td>
@@ -275,56 +282,56 @@ export default function ApplicationTracker() {
               <h3 className="font-semibold text-gray-900 mb-3">Program Information</h3>
               <div className="bg-blue-50 p-4 rounded-lg">
                 <h4 className="text-lg font-semibold text-blue-900 mb-2">
-                  {selectedApplication.programs.title}
+                  {selectedApplication.program?.title || "Unknown Program"}
                 </h4>
-                <p className="text-blue-800 mb-4">{selectedApplication.programs.description}</p>
+                <p className="text-blue-800 mb-4">{selectedApplication.program?.description || "No description available"}</p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-blue-700">Program Type</label>
-                    <p className="text-blue-900">{selectedApplication.programs.program_type}</p>
+                    <p className="text-blue-900">{selectedApplication.program?.program_type || "Not specified"}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-blue-700">Location</label>
-                    <p className="text-blue-900">{selectedApplication.programs.location}</p>
+                    <p className="text-blue-900">{selectedApplication.program?.location || "Not specified"}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-blue-700">Delivery Mode</label>
-                    <p className="text-blue-900">{selectedApplication.programs.delivery_mode}</p>
+                    <p className="text-blue-900">{selectedApplication.program?.delivery_mode || "Not specified"}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-blue-700">Duration</label>
-                    <p className="text-blue-900">{selectedApplication.programs.duration || "Not specified"}</p>
+                    <p className="text-blue-900">{selectedApplication.program?.duration || "Not specified"}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-blue-700">Age Group</label>
-                    <p className="text-blue-900">{selectedApplication.programs.age_group}</p>
+                    <p className="text-blue-900">{selectedApplication.program?.age_group || "Not specified"}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-blue-700">Cost</label>
-                    <p className="text-blue-900">{selectedApplication.programs.cost}</p>
+                    <p className="text-blue-900">{selectedApplication.program?.cost || "Not specified"}</p>
                   </div>
                 </div>
 
-                {(selectedApplication.programs.contact_email || selectedApplication.programs.website) && (
+                {(selectedApplication.program?.contact_email || selectedApplication.program?.website) && (
                   <div className="mt-4 pt-4 border-t border-blue-200">
                     <h5 className="font-medium text-blue-700 mb-2">Contact Information</h5>
                     <div className="space-y-1">
-                      {selectedApplication.programs.contact_email && (
+                      {selectedApplication.program?.contact_email && (
                         <p className="text-blue-900">
-                          <span className="font-medium">Email:</span> {selectedApplication.programs.contact_email}
+                          <span className="font-medium">Email:</span> {selectedApplication.program.contact_email}
                         </p>
                       )}
-                      {selectedApplication.programs.website && (
+                      {selectedApplication.program?.website && (
                         <p className="text-blue-900">
                           <span className="font-medium">Website:</span>{" "}
                           <a 
-                            href={selectedApplication.programs.website} 
+                            href={selectedApplication.program.website} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:underline"
                           >
-                            {selectedApplication.programs.website}
+                            {selectedApplication.program.website}
                           </a>
                         </p>
                       )}

@@ -75,7 +75,15 @@ export default function ApplicationDetails({ applicationId, onClose }: Applicati
           console.error("Error fetching application:", error);
           setError("Failed to load application details");
         } else {
-          setApplication(data);
+          // Handle the case where Supabase returns program as an array
+          const applicationData = data as any;
+          const processedData: ApplicationData = {
+            ...applicationData,
+            program: Array.isArray(applicationData.program) 
+              ? applicationData.program[0] || null 
+              : applicationData.program
+          };
+          setApplication(processedData);
         }
       } catch (error) {
         console.error("Unexpected error:", error);
