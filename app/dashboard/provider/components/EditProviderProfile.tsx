@@ -170,7 +170,7 @@ export default function EditProviderProfile() {
       <div className="flex flex-col items-center justify-center py-12">
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 1, repeat: Infinity }}
           className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full mb-4"
         />
         <div className="text-gray-600 text-lg font-medium">Loading your profile...</div>

@@ -100,7 +100,7 @@ export default function SignupPage() {
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.97 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          transition={{ duration: 0.4 }}
           className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-4 md:p-8"
         >
           <h2 className="text-2xl font-bold text-center text-[#111827] mb-6">Create Your Account</h2>

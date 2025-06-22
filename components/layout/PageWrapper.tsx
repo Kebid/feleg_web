@@ -16,7 +16,7 @@ export default function PageWrapper({ children }: PageWrapperProps) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
+        transition={{ duration: 0.3 }}
         className="min-h-screen p-4 md:p-8"
       >
         {children}

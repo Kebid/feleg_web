@@ -98,7 +98,7 @@ export default function FindPrograms() {
         className="bg-blue-50 rounded-2xl shadow p-4 mb-6 flex flex-col md:flex-row md:items-end gap-4 border-2 border-blue-200"
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
+        transition={{ duration: 0.5 }}
       >
         <motion.input
           type="text"

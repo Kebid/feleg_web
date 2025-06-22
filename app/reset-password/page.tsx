@@ -55,7 +55,7 @@ export default function ResetPasswordPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          transition={{ duration: 0.4 }}
           className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-4 md:p-8 text-center"
         >
           <div className="text-6xl mb-4">✅</div>
@@ -79,7 +79,7 @@ export default function ResetPasswordPage() {
       <motion.div
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
+        transition={{ duration: 0.4 }}
         className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-4 md:p-8"
       >
         <h2 className="text-2xl font-bold text-center text-[#111827] mb-2">Set New Password</h2>
