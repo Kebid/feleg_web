@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Card from "@/components/ui/Card";
+import { Button } from "@/components/ui/button";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -78,7 +79,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
@@ -138,7 +139,7 @@ export default function HomePage() {
       </section>
 
       {/* Featured Programs Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -147,10 +148,10 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Featured Programs
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Discover some of our most popular enrichment programs
             </p>
           </motion.div>
@@ -173,10 +174,10 @@ export default function HomePage() {
                     )}
                     
                     <div className="mb-4">
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                         {program.title}
                       </h3>
-                      <p className="text-gray-600 mb-4">
+                      <p className="text-gray-600 dark:text-gray-300 mb-4">
                         {program.description}
                       </p>
                     </div>

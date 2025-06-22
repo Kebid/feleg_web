@@ -98,7 +98,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -124,7 +124,7 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-2xl font-bold text-gray-900 mt-6 mb-2"
+              className="text-2xl font-bold text-gray-900 dark:text-white mt-6 mb-2"
             >
               Welcome back! 👋
             </motion.h2>
@@ -132,7 +132,7 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="text-gray-600"
+              className="text-gray-600 dark:text-gray-300"
             >
               Sign in to your account to continue
             </motion.p>
@@ -143,7 +143,7 @@ export default function LoginPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100"
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700"
           >
             <form onSubmit={handleSubmit} className="space-y-6">
               <motion.div custom={0} variants={inputVariants} initial="hidden" animate="visible">
