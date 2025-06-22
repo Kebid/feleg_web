@@ -65,7 +65,7 @@ export default function Applications() {
             interests,
             status,
             submitted_at,
-            programs (
+            program:program_id (
               id,
               title
             )
@@ -117,12 +117,12 @@ export default function Applications() {
   };
 
   // Get unique program titles for filter dropdown
-  const programTitles = Array.from(new Set(applications.map((a) => a.programs?.title).filter(Boolean)));
+  const programTitles = Array.from(new Set(applications.map((a) => a.program?.title).filter(Boolean)));
 
   // Filtered applications
   const filteredApps = applications.filter((app) =>
     (statusFilter ? app.status === statusFilter : true) &&
-    (programFilter ? app.programs?.title === programFilter : true)
+    (programFilter ? app.program?.title === programFilter : true)
   );
 
   if (loading) {
@@ -208,7 +208,7 @@ export default function Applications() {
               {filteredApps.map((app) => (
                 <tr key={app.id} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="px-4 py-3 font-semibold text-gray-900">
-                    {app.programs?.title || "Unknown Program"}
+                    {app.program?.title || "Unknown Program"}
                   </td>
                   <td className="px-4 py-3 text-gray-700">{app.child_name}</td>
                   <td className="px-4 py-3 text-gray-700">{app.child_age}</td>
