@@ -15,32 +15,65 @@ export default function Navbar() {
   const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
+    console.log("Navbar useEffect running, checking auth...");
+    
+    // Check if Supabase is properly configured
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      console.error("Supabase environment variables not found!");
+      setLoading(false);
+      return;
+    }
+    
     const getUserAndProfile = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
+        console.log("Getting user from Supabase...");
+        const { data: { user }, error } = await supabase.auth.getUser();
+        console.log("User data:", user, "Error:", error);
         
-        if (user) {
-          const { data: profileData, error } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", user.id)
-            .single();
+        if (error) {
+          console.error("Auth error:", error);
+          setUser(null);
+          setProfile(null);
+        } else {
+          setUser(user);
           
-          if (!error && profileData) {
-            setProfile(profileData);
+          if (user) {
+            console.log("Fetching profile for user:", user.id);
+            const { data: profileData, error: profileError } = await supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", user.id)
+              .single();
+            
+            console.log("Profile data:", profileData, "Profile error:", profileError);
+            
+            if (!profileError && profileData) {
+              setProfile(profileData);
+            }
           }
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
+        setUser(null);
+        setProfile(null);
       } finally {
+        console.log("Setting loading to false");
         setLoading(false);
       }
     };
 
-    getUserAndProfile();
+    // Add timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.warn("Auth check timeout after 3 seconds, forcing loading to false");
+      setLoading(false);
+    }, 3000);
+
+    getUserAndProfile().finally(() => {
+      clearTimeout(timeoutId);
+    });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session?.user?.id);
       setLoading(true);
       setUser(session?.user ?? null);
       
@@ -90,6 +123,12 @@ export default function Navbar() {
     }
   };
 
+  // If we're on auth pages, don't show the loading spinner
+  const isAuthPage = pathname.startsWith("/login") || 
+                    pathname.startsWith("/signup") || 
+                    pathname.startsWith("/forgot-password") || 
+                    pathname.startsWith("/reset-password");
+
   return (
     <motion.nav 
       initial={{ opacity: 0, y: -20 }}
@@ -109,7 +148,7 @@ export default function Navbar() {
                 Feleg
               </span>
             </Link>
-            {(pathname.startsWith("/login") || pathname.startsWith("/signup") || pathname.startsWith("/forgot-password") || pathname.startsWith("/reset-password")) && (
+            {isAuthPage && (
               <Link href="/" className="text-gray-600 hover:text-blue-600 text-sm font-medium transition-colors">
                 ← Back to Home
               </Link>
@@ -132,7 +171,7 @@ export default function Navbar() {
 
           {/* User Menu */}
           <div className="flex items-center gap-4">
-            {loading ? (
+            {loading && !(pathname.startsWith("/login") || pathname.startsWith("/signup") || pathname.startsWith("/forgot-password") || pathname.startsWith("/reset-password")) ? (
               <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
             ) : user ? (
               <div className="flex items-center gap-3">
