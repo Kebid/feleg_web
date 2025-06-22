@@ -16,7 +16,7 @@ interface ApplicationData {
   interests: string;
   status: string;
   submitted_at: string;
-  programs: {
+  programs: Array<{
     id: string;
     title: string;
     description: string;
@@ -31,7 +31,7 @@ interface ApplicationData {
     contact_email: string;
     website: string;
     provider_id: string;
-  };
+  }>;
 }
 
 export default function ApplicationDetails({ applicationId, onClose }: ApplicationDetailsProps) {
@@ -101,6 +101,8 @@ export default function ApplicationDetails({ applicationId, onClose }: Applicati
     }
   };
 
+  const program = application?.programs?.[0];
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-8">
@@ -110,10 +112,10 @@ export default function ApplicationDetails({ applicationId, onClose }: Applicati
     );
   }
 
-  if (error || !application) {
+  if (error || !application || !program) {
     return (
       <div className="text-center py-8">
-        <div className="text-red-500 mb-2">{error || "Application not found"}</div>
+        <div className="text-red-500 mb-2">{error || "Application or program data not found"}</div>
         <button 
           onClick={onClose}
           className="text-blue-600 hover:underline"
@@ -180,68 +182,68 @@ export default function ApplicationDetails({ applicationId, onClose }: Applicati
         <h3 className="font-semibold text-gray-900 mb-3">Program Information</h3>
         <div className="bg-blue-50 p-4 rounded-lg">
           <h4 className="text-lg font-semibold text-blue-900 mb-2">
-            {application.programs.title}
+            {program.title}
           </h4>
-          <p className="text-blue-800 mb-4">{application.programs.description}</p>
+          <p className="text-blue-800 mb-4">{program.description}</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-blue-700">Program Type</label>
-              <p className="text-blue-900">{application.programs.program_type}</p>
+              <p className="text-blue-900">{program.program_type}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-blue-700">Location</label>
-              <p className="text-blue-900">{application.programs.location}</p>
+              <p className="text-blue-900">{program.location}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-blue-700">Delivery Mode</label>
-              <p className="text-blue-900">{application.programs.delivery_mode}</p>
+              <p className="text-blue-900">{program.delivery_mode}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-blue-700">Duration</label>
-              <p className="text-blue-900">{application.programs.duration || "Not specified"}</p>
+              <p className="text-blue-900">{program.duration || "Not specified"}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-blue-700">Age Group</label>
-              <p className="text-blue-900">{application.programs.age_group}</p>
+              <p className="text-blue-900">{program.age_group}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-blue-700">Cost</label>
-              <p className="text-blue-900">{application.programs.cost}</p>
+              <p className="text-blue-900">{program.cost}</p>
             </div>
-            {application.programs.start_date && (
+            {program.start_date && (
               <div>
                 <label className="block text-sm font-medium text-blue-700">Start Date</label>
-                <p className="text-blue-900">{new Date(application.programs.start_date).toLocaleDateString()}</p>
+                <p className="text-blue-900">{new Date(program.start_date).toLocaleDateString()}</p>
               </div>
             )}
-            {application.programs.deadline && (
+            {program.deadline && (
               <div>
                 <label className="block text-sm font-medium text-blue-700">Application Deadline</label>
-                <p className="text-blue-900">{new Date(application.programs.deadline).toLocaleDateString()}</p>
+                <p className="text-blue-900">{new Date(program.deadline).toLocaleDateString()}</p>
               </div>
             )}
           </div>
 
-          {(application.programs.contact_email || application.programs.website) && (
+          {(program.contact_email || program.website) && (
             <div className="mt-4 pt-4 border-t border-blue-200">
               <h5 className="font-medium text-blue-700 mb-2">Contact Information</h5>
               <div className="space-y-1">
-                {application.programs.contact_email && (
+                {program.contact_email && (
                   <p className="text-blue-900">
-                    <span className="font-medium">Email:</span> {application.programs.contact_email}
+                    <span className="font-medium">Email:</span> {program.contact_email}
                   </p>
                 )}
-                {application.programs.website && (
+                {program.website && (
                   <p className="text-blue-900">
                     <span className="font-medium">Website:</span>{" "}
                     <a 
-                      href={application.programs.website} 
+                      href={program.website} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline"
                     >
-                      {application.programs.website}
+                      {program.website}
                     </a>
                   </p>
                 )}
@@ -252,12 +254,10 @@ export default function ApplicationDetails({ applicationId, onClose }: Applicati
       </div>
 
       {/* Provider Information */}
-      {application.programs.provider_id && (
-        <div className="mb-6">
-          <h3 className="font-semibold text-gray-900 mb-3">About the Provider</h3>
-          <ViewProviderProfile providerId={application.programs.provider_id} />
-        </div>
-      )}
+      <div className="mb-6">
+        <h3 className="font-semibold text-gray-900 mb-3">Provider Information</h3>
+        <ViewProviderProfile providerId={program.provider_id} />
+      </div>
 
       {/* Status-specific information */}
       {application.status === "Accepted" && (
