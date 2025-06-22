@@ -7,25 +7,25 @@ export default function MyProgramsPage() {
   const [programs, setPrograms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [userId, setUserId] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUserId(data?.user?.id || null);
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
     };
     getUser();
   }, []);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!user) return;
     const fetchPrograms = async () => {
       setLoading(true);
       setError("");
       const { data, error } = await supabase
         .from("programs")
         .select("id, title, program_type, location, delivery_mode, duration, age_group, cost, date, provider_id")
-        .eq("provider_id", userId)
+        .eq("provider_id", user.id)
         .order("date", { ascending: false });
       if (error) {
         setError(error.message);
@@ -35,7 +35,7 @@ export default function MyProgramsPage() {
       setLoading(false);
     };
     fetchPrograms();
-  }, [userId]);
+  }, [user]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this program?")) return;

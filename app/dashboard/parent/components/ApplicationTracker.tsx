@@ -45,7 +45,8 @@ export default function ApplicationTracker() {
     const fetchApplications = async () => {
       try {
         // Get current user
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        const { data: { session }, error: userError } = await supabase.auth.getSession();
+        const user = session?.user;
         if (userError || !user) {
           setError("Failed to get user information");
           setLoading(false);

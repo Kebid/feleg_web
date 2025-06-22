@@ -27,22 +27,24 @@ export default function Navbar() {
     const getUserAndProfile = async () => {
       try {
         console.log("Getting user from Supabase...");
-        const { data: { user }, error } = await supabase.auth.getUser();
-        console.log("User data:", user, "Error:", error);
+        
+        // Use getSession instead of getUser to avoid AuthSessionMissingError
+        const { data: { session }, error } = await supabase.auth.getSession();
+        console.log("Session data:", session, "Error:", error);
         
         if (error) {
           console.error("Auth error:", error);
           setUser(null);
           setProfile(null);
         } else {
-          setUser(user);
+          setUser(session?.user || null);
           
-          if (user) {
-            console.log("Fetching profile for user:", user.id);
+          if (session?.user) {
+            console.log("Fetching profile for user:", session.user.id);
             const { data: profileData, error: profileError } = await supabase
               .from("profiles")
               .select("*")
-              .eq("id", user.id)
+              .eq("id", session.user.id)
               .single();
             
             console.log("Profile data:", profileData, "Profile error:", profileError);

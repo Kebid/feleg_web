@@ -51,8 +51,8 @@ export default function EditProgram({ programId, onClose, onUpdate }: EditProgra
 
   useEffect(() => {
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data?.user || null);
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
     };
     getUser();
   }, []);
