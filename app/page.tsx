@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Card from "@/components/ui/Card";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/ui/Button";
 
 const containerVariants = {
   hidden: { opacity: 0 },
