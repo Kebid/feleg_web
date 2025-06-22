@@ -4,6 +4,7 @@ import "./globals.css";
 import AppShell from "@/components/AppShell";
 import PageWrapper from "@/components/layout/PageWrapper";
 import ToastProvider from "@/components/providers/ToastProvider";
+import ThemeProvider from "@/components/providers/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,12 +29,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col ${geistSans.variable} ${geistMono.variable}`}>
-        <ToastProvider />
-        <AppShell>
-          <PageWrapper>
-            {children}
-          </PageWrapper>
-        </AppShell>
+        <ThemeProvider>
+          <ToastProvider />
+          <AppShell>
+            <PageWrapper>
+              {children}
+            </PageWrapper>
+          </AppShell>
+        </ThemeProvider>
       </body>
     </html>
   );
