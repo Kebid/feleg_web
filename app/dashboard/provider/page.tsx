@@ -4,11 +4,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import MyPrograms from "./components/MyPrograms";
 import PostProgram from "./components/PostProgram";
 import Applications from "./components/Applications";
+import EditProfile from "./components/EditProfile";
 
 const tabs = [
   { label: "My Programs", value: "programs" },
   { label: "Post New Program", value: "post" },
   { label: "Applications", value: "applications" },
+  { label: "Edit Profile", value: "profile" },
 ];
 
 export default function ProviderDashboard() {
@@ -75,6 +77,17 @@ export default function ProviderDashboard() {
                 transition={{ duration: 0.4 }}
               >
                 <Applications />
+              </motion.div>
+            )}
+            {activeTab === "profile" && (
+              <motion.div
+                key="profile"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 24 }}
+                transition={{ duration: 0.4 }}
+              >
+                <EditProfile />
               </motion.div>
             )}
           </AnimatePresence>

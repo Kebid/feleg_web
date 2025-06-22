@@ -37,7 +37,7 @@ export default function Applications() {
         // First, get the program IDs for this provider
         const { data: programs, error: programsError } = await supabase
           .from('programs')
-          .select('id')
+          .select('id, title')
           .eq('provider_id', user.id);
 
         if (programsError) {
@@ -92,14 +92,15 @@ export default function Applications() {
 
   const handleAction = async (id: string, action: "Accepted" | "Rejected") => {
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("applications")
         .update({ status: action })
-        .eq("id", id);
+        .eq("id", id)
+        .select();
 
       if (error) {
         console.error("Error updating application:", error);
-        alert("Failed to update application status");
+        alert(`Failed to update application status: ${error.message}`);
       } else {
         // Update local state
         setApplications((prev) =>
@@ -107,6 +108,7 @@ export default function Applications() {
             app.id === id ? { ...app, status: action } : app
           )
         );
+        alert(`Application ${action.toLowerCase()} successfully!`);
       }
     } catch (error) {
       console.error("Unexpected error:", error);

@@ -51,13 +51,6 @@ export default function Home() {
               >
                 Browse Programs
               </motion.a>
-              <motion.a
-                href="/signup"
-                whileHover={{ scale: 1.05 }}
-                className="inline-block border border-[#3B82F6] text-[#3B82F6] bg-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-blue-50 transition focus:outline-none focus:ring-2 focus:ring-blue-200 focus:ring-offset-2"
-              >
-                Register as Provider
-              </motion.a>
             </div>
           </motion.div>
           <motion.div

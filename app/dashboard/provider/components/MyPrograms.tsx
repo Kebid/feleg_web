@@ -2,12 +2,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import Link from "next/link";
+import EditProgram from "./EditProgram";
 
 export default function MyPrograms() {
   const [programs, setPrograms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
+  const [editingProgram, setEditingProgram] = useState<string | null>(null);
 
   useEffect(() => {
     const getUser = async () => {
@@ -24,7 +26,7 @@ export default function MyPrograms() {
       setError("");
       const { data, error } = await supabase
         .from("programs")
-        .select("id, title, program_type, location, delivery_mode, duration, age_group, cost, date, provider_id")
+        .select("id, title, program_type, location, delivery_mode, duration, age_group, cost, date, provider_id, is_active")
         .eq("provider_id", userId)
         .order("date", { ascending: false });
       if (error) {
@@ -47,11 +49,36 @@ export default function MyPrograms() {
     }
   };
 
+  const handleEdit = (programId: string) => {
+    setEditingProgram(programId);
+  };
+
+  const handleCloseEdit = () => {
+    setEditingProgram(null);
+  };
+
+  const handleProgramUpdate = () => {
+    // Refresh the programs list
+    if (userId) {
+      const fetchPrograms = async () => {
+        const { data, error } = await supabase
+          .from("programs")
+          .select("id, title, program_type, location, delivery_mode, duration, age_group, cost, date, provider_id, is_active")
+          .eq("provider_id", userId)
+          .order("date", { ascending: false });
+        if (!error) {
+          setPrograms(data || []);
+        }
+      };
+      fetchPrograms();
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">My Programs</h1>
       <div className="mb-4">
-        <span className="text-blue-600 font-semibold">+ Post New Program</span>
+        <Link href="/dashboard/provider/post-program" className="text-blue-600 hover:underline">+ Post New Program</Link>
       </div>
       {loading ? (
         <div className="text-center py-8 text-gray-500">Loading programs...</div>
@@ -68,6 +95,7 @@ export default function MyPrograms() {
                 <th className="px-4 py-2 text-left">Type</th>
                 <th className="px-4 py-2 text-left">Location</th>
                 <th className="px-4 py-2 text-left">Delivery</th>
+                <th className="px-4 py-2 text-left">Status</th>
                 <th className="px-4 py-2 text-left">Date</th>
                 <th className="px-4 py-2 text-left">Actions</th>
               </tr>
@@ -79,15 +107,40 @@ export default function MyPrograms() {
                   <td className="px-4 py-2">{program.program_type}</td>
                   <td className="px-4 py-2">{program.location}</td>
                   <td className="px-4 py-2">{program.delivery_mode}</td>
+                  <td className="px-4 py-2">
+                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                      program.is_active !== false 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {program.is_active !== false ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
                   <td className="px-4 py-2">{program.date || "-"}</td>
                   <td className="px-4 py-2">
-                    <span className="text-blue-600 hover:underline mr-2 cursor-pointer">View</span>
+                    <button 
+                      onClick={() => handleEdit(program.id)} 
+                      className="text-blue-600 hover:underline mr-2"
+                    >
+                      Edit
+                    </button>
                     <button onClick={() => handleDelete(program.id)} className="text-red-500 hover:underline mr-2">Delete</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Edit Program Modal */}
+      {editingProgram && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <EditProgram
+            programId={editingProgram}
+            onClose={handleCloseEdit}
+            onUpdate={handleProgramUpdate}
+          />
         </div>
       )}
     </div>
