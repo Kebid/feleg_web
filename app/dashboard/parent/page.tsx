@@ -4,13 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import FindPrograms from "./components/FindPrograms";
 import ApplicationTracker from "./components/ApplicationTracker";
 import Notifications from "./components/Notifications";
-import ApplicationDetails from "./components/ApplicationDetails";
 
 const tabs = [
   { label: "Find Programs", value: "programs", icon: "🔍" },
   { label: "My Applications", value: "applications", icon: "📝" },
   { label: "Notifications", value: "notifications", icon: "🔔" },
-  { label: "Application Details", value: "details", icon: "📋" },
 ];
 
 export default function ParentDashboard() {
@@ -77,7 +75,7 @@ export default function ParentDashboard() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, ease: [0.42, 0, 0.58, 1] }}
                 className="p-6"
               >
                 <FindPrograms />
@@ -89,7 +87,7 @@ export default function ParentDashboard() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, ease: [0.42, 0, 0.58, 1] }}
                 className="p-6"
               >
                 <ApplicationTracker />
@@ -101,22 +99,10 @@ export default function ParentDashboard() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, ease: [0.42, 0, 0.58, 1] }}
                 className="p-6"
               >
                 <Notifications />
-              </motion.div>
-            )}
-            {activeTab === "details" && (
-              <motion.div
-                key="details"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="p-6"
-              >
-                <ApplicationDetails />
               </motion.div>
             )}
           </AnimatePresence>
