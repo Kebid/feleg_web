@@ -4,8 +4,59 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import Card from "@/components/ui/Card";
 
-export default function Home() {
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: "easeOut" },
+  },
+};
+
+const featuredPrograms = [
+  {
+    id: "1",
+    title: "🧠 STEM Robotics Workshop",
+    description: "Learn coding and robotics through hands-on projects",
+    type: "STEM",
+    location: "San Francisco, CA",
+    cost: "$150",
+    featured: true,
+  },
+  {
+    id: "2", 
+    title: "🎨 Creative Arts & Design",
+    description: "Express yourself through painting, drawing, and digital art",
+    type: "Arts",
+    location: "New York, NY",
+    cost: "$120",
+    featured: false,
+  },
+  {
+    id: "3",
+    title: "⚽ Youth Soccer Academy",
+    description: "Develop skills, teamwork, and sportsmanship",
+    type: "Sports",
+    location: "Austin, TX",
+    cost: "$200",
+    featured: false,
+  },
+];
+
+export default function HomePage() {
   const router = useRouter();
   useEffect(() => {
     // router.replace("/login");
@@ -27,102 +78,239 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="bg-[#F9FAFB] min-h-screen flex flex-col justify-between">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Hero Section */}
-      <section className="bg-[#F9FAFB] py-12 flex justify-center">
-        <div className="w-full max-w-6xl rounded-3xl bg-[#F9FAFB] p-6 md:p-12 flex flex-col md:flex-row items-center shadow-none">
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="flex-1 flex flex-col items-start justify-center space-y-6 md:pr-8"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="text-center"
           >
-            <h1 className="text-4xl md:text-5xl font-extrabold text-[#111827] leading-tight">
-              Feleg: Unlock your child's full potential
-            </h1>
-            <p className="text-lg md:text-xl text-[#111827]">
-              Browse and apply to programs tailored to your child's age and interest
+            <motion.h1
+              variants={itemVariants}
+              className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900 mb-6"
+            >
+              Discover Amazing
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                {" "}Programs
+              </span>
+              <br />
+              for Your Child
+            </motion.h1>
+            
+            <motion.p
+              variants={itemVariants}
+              className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed"
+            >
+              Connect with the best enrichment programs in your area. From STEM to arts, 
+              sports to music — find the perfect program to nurture your child's passions.
+            </motion.p>
+
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            >
+              <Link href="/programs">
+                <motion.button
+                  className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-lg"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  🚀 Explore Programs
+                </motion.button>
+              </Link>
+              
+              <Link href="/signup">
+                <motion.button
+                  className="px-8 py-4 bg-white border-2 border-blue-600 text-blue-600 font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-lg"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  ✨ Join Feleg
+                </motion.button>
+              </Link>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Featured Programs Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Featured Programs
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Discover some of our most popular enrichment programs
             </p>
-            <div className="flex gap-4 mt-4">
-              <motion.a
-                href="/dashboard/parent"
-                whileHover={{ scale: 1.05, boxShadow: "0 4px 24px 0 #3B82F655" }}
-                className="inline-block bg-[#3B82F6] text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-blue-200 transition focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2"
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredPrograms.map((program, index) => (
+              <motion.div
+                key={program.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
               >
-                Browse Programs
-              </motion.a>
+                <Card hover className="h-full">
+                  <div className="relative">
+                    {program.featured && (
+                      <div className="absolute -top-3 -right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                        ✨ Featured
+                      </div>
+                    )}
+                    
+                    <div className="mb-4">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        {program.title}
+                      </h3>
+                      <p className="text-gray-600 mb-4">
+                        {program.description}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
+                        {program.type}
+                      </span>
+                      <span className="text-lg font-bold text-green-600">
+                        {program.cost}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center text-sm text-gray-500 mb-4">
+                      <span className="mr-2">📍</span>
+                      {program.location}
+                    </div>
+
+                    <Link href={`/programs/${program.id}`}>
+                      <motion.button
+                        className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        Learn More
+                      </motion.button>
+                    </Link>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              How Feleg Works
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Simple steps to find and enroll in the perfect program
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: "🔍",
+                title: "Discover",
+                description: "Browse programs by category, location, or age group"
+              },
+              {
+                icon: "📝",
+                title: "Apply",
+                description: "Submit applications with just a few clicks"
+              },
+              {
+                icon: "🎉",
+                title: "Enroll",
+                description: "Get accepted and start your child's journey"
+              }
+            ].map((step, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="text-center"
+              >
+                <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="text-4xl mb-4">{step.icon}</div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    {step.title}
+                  </h3>
+                  <p className="text-gray-600">
+                    {step.description}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Ready to Get Started?
+            </h2>
+            <p className="text-xl text-blue-100 mb-8">
+              Join thousands of parents who trust Feleg to find the best programs for their children
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/signup">
+                <motion.button
+                  className="px-8 py-4 bg-white text-blue-600 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-lg"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  🚀 Create Account
+                </motion.button>
+              </Link>
+              
+              <Link href="/programs">
+                <motion.button
+                  className="px-8 py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-blue-600 transition-all duration-300 text-lg"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  🔍 Browse Programs
+                </motion.button>
+              </Link>
             </div>
           </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
-            className="flex-1 flex justify-center items-center mt-10 md:mt-0"
-          >
-            <img
-              src="/illustration.svg"
-              alt="Learning illustration"
-              className="max-w-full h-auto md:max-w-md lg:max-w-lg drop-shadow-xl"
-            />
-          </motion.div>
         </div>
       </section>
-
-      {/* Featured Benefits Section */}
-      <section className="py-16 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center text-center reveal opacity-0 translate-y-8 transition-all duration-700">
-          <div className="mb-4 text-[#3B82F6] text-3xl">📈</div>
-          <h3 className="font-bold text-lg text-[#111827] mb-2">Easy Application Tracking</h3>
-          <p className="text-gray-600">Monitor your child's applications in one place.</p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center text-center reveal opacity-0 translate-y-8 transition-all duration-700">
-          <div className="mb-4 text-[#F59E0B] text-3xl">✅</div>
-          <h3 className="font-bold text-lg text-[#111827] mb-2">Verified Providers</h3>
-          <p className="text-gray-600">All programs are vetted for quality and safety.</p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center text-center reveal opacity-0 translate-y-8 transition-all duration-700">
-          <div className="mb-4 text-[#3B82F6] text-3xl">🌐</div>
-          <h3 className="font-bold text-lg text-[#111827] mb-2">Online & In-Person Options</h3>
-          <p className="text-gray-600">Choose what works best for your family's schedule.</p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center text-center reveal opacity-0 translate-y-8 transition-all duration-700">
-          <div className="mb-4 text-[#F59E0B] text-3xl">🎯</div>
-          <h3 className="font-bold text-lg text-[#111827] mb-2">Age-Appropriate Filters</h3>
-          <p className="text-gray-600">Find programs tailored to your child's age and interests.</p>
-        </div>
-      </section>
-
-      {/* Testimonials Section (optional) */}
-      <section className="py-12 max-w-4xl mx-auto">
-        <h2 className="text-2xl font-bold text-center text-[#111827] mb-8 reveal opacity-0 translate-y-8 transition-all duration-700">What Parents Are Saying</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-lg shadow p-6 reveal opacity-0 translate-y-8 transition-all duration-700">
-            <p className="text-gray-700 italic mb-4">"This platform made it so easy to find the perfect summer camp for my daughter!"</p>
-            <div className="font-semibold text-[#3B82F6]">— Sarah K.</div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6 reveal opacity-0 translate-y-8 transition-all duration-700">
-            <p className="text-gray-700 italic mb-4">"I love the verified provider feature. I feel confident in my choices."</p>
-            <div className="font-semibold text-[#F59E0B]">— James L.</div>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6 reveal opacity-0 translate-y-8 transition-all duration-700">
-            <p className="text-gray-700 italic mb-4">"The online options were a lifesaver during the school break!"</p>
-            <div className="font-semibold text-[#3B82F6]">— Priya S.</div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-6 mt-8">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center">
-          <div className="text-[#111827] font-bold text-lg mb-4 md:mb-0">Enrichment Finder</div>
-          <nav className="flex gap-6 text-[#3B82F6] text-sm">
-            <Link href="#"><span className="hover:underline">About</span></Link>
-            <Link href="#"><span className="hover:underline">Contact</span></Link>
-            <Link href="#"><span className="hover:underline">FAQ</span></Link>
-            <Link href="#"><span className="hover:underline">Terms</span></Link>
-          </nav>
-        </div>
-      </footer>
-    </main>
+    </div>
   );
 }

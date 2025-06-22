@@ -1,0 +1,11 @@
+app/dashboard/parent/components/ApplicationDetails.tsx
+app/dashboard/parent/components/ApplicationTracker.tsx
+app/dashboard/parent/components/Notifications.tsx
+app/dashboard/provider/components/Applications.tsx
+app/dashboard/provider/components/EditProfile.tsx
+app/dashboard/provider/components/EditProgram.tsx
+app/dashboard/provider/components/MyPrograms.tsx
+app/dashboard/provider/page.tsx
+app/page.tsx
+fix_application_trigger.sql
+supabase_notifications_table.sql

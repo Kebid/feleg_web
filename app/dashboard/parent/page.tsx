@@ -1,70 +1,127 @@
 "use client";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import FindPrograms from "./components/FindPrograms";
 import ApplicationTracker from "./components/ApplicationTracker";
-import { motion } from "framer-motion";
+import Notifications from "./components/Notifications";
+import ApplicationDetails from "./components/ApplicationDetails";
+
+const tabs = [
+  { label: "Find Programs", value: "programs", icon: "🔍" },
+  { label: "My Applications", value: "applications", icon: "📝" },
+  { label: "Notifications", value: "notifications", icon: "🔔" },
+  { label: "Application Details", value: "details", icon: "📋" },
+];
 
 export default function ParentDashboard() {
-  // In a real app, fetch user info from context or Supabase
+  const [activeTab, setActiveTab] = useState("programs");
   const userName = "Parent User";
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="max-w-5xl mx-auto mb-8"
-      >
-        <h1 className="text-3xl md:text-4xl font-extrabold text-[#111827] mb-2">
-          Welcome{userName ? `, ${userName}` : ""}!
-        </h1>
-        <p className="text-blue-700 text-base md:text-lg mb-4">
-          This is your Parent Dashboard. Browse recommended programs and track your applications below.
-        </p>
-      </motion.div>
-
-      {/* Recommended Programs Section */}
-      <motion.section
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={{
-          hidden: {},
-          show: {
-            transition: { staggerChildren: 0.12 }
-          }
-        }}
-        className="max-w-5xl mx-auto mb-10"
-      >
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-2xl font-bold mb-6 text-blue-700"
+          transition={{ duration: 0.6 }}
         >
-          Recommended Programs
-        </motion.h2>
-        <FindPrograms />
-      </motion.section>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-3">
+            Welcome back, <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{userName}!</span>
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl">
+            Discover amazing enrichment programs for your child and track your applications in one place.
+          </p>
+        </motion.div>
+      </div>
 
-      {/* My Applications Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="max-w-5xl mx-auto"
-      >
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }}
+      {/* Tabs */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-2xl font-bold mb-6 text-blue-700"
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="bg-white rounded-2xl shadow-lg p-2"
         >
-          My Applications
-        </motion.h2>
-        <ApplicationTracker />
-      </motion.section>
+          <div className="flex gap-2">
+            {tabs.map((tab) => (
+              <motion.button
+                key={tab.value}
+                onClick={() => setActiveTab(tab.value)}
+                className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  activeTab === tab.value
+                    ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <span className="text-lg">{tab.icon}</span>
+                <span className="hidden sm:inline">{tab.label}</span>
+              </motion.button>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Content Area */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="bg-white rounded-2xl shadow-lg overflow-hidden"
+        >
+          <AnimatePresence mode="wait">
+            {activeTab === "programs" && (
+              <motion.div
+                key="programs"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="p-6"
+              >
+                <FindPrograms />
+              </motion.div>
+            )}
+            {activeTab === "applications" && (
+              <motion.div
+                key="applications"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="p-6"
+              >
+                <ApplicationTracker />
+              </motion.div>
+            )}
+            {activeTab === "notifications" && (
+              <motion.div
+                key="notifications"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="p-6"
+              >
+                <Notifications />
+              </motion.div>
+            )}
+            {activeTab === "details" && (
+              <motion.div
+                key="details"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="p-6"
+              >
+                <ApplicationDetails />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </div>
     </div>
   );
 } 

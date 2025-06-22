@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 
 const inputVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -96,99 +98,157 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB]">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
       <AnimatePresence>
         <motion.div
-          initial={{ opacity: 0, scale: 0.97 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.97 }}
+          exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-4 md:p-8"
+          className="w-full max-w-md"
         >
-          <h2 className="text-2xl font-bold text-center text-[#111827] mb-6">Welcome Back</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <motion.div custom={0} variants={inputVariants} initial="hidden" animate="visible">
-              <label htmlFor="email" className="block text-sm font-medium text-[#111827] mb-1">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                name="email"
-                placeholder="you@email.com"
-                value={form.email}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
-                required
-                autoComplete="email"
-              />
+          {/* Header */}
+          <div className="text-center mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Link href="/">
+                <span className="font-bold text-3xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tight cursor-pointer">
+                  Feleg
+                </span>
+              </Link>
             </motion.div>
-            <motion.div custom={1} variants={inputVariants} initial="hidden" animate="visible">
-              <label htmlFor="password" className="block text-sm font-medium text-[#111827] mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-2xl font-bold text-gray-900 mt-6 mb-2"
+            >
+              Welcome back! 👋
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-gray-600"
+            >
+              Sign in to your account to continue
+            </motion.p>
+          </div>
+
+          {/* Form */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100"
+          >
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <motion.div custom={0} variants={inputVariants} initial="hidden" animate="visible">
+                <Input
+                  label="Email Address"
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                  icon="📧"
+                />
+              </motion.div>
+
+              <motion.div custom={1} variants={inputVariants} initial="hidden" animate="visible">
+                <Input
+                  label="Password"
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  placeholder="••••••••"
                   value={form.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6] pr-10"
                   required
-                  autoComplete="current-password"
+                  disabled={loading}
+                  icon="🔒"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 text-sm"
-                  tabIndex={-1}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+              </motion.div>
+
+              <motion.div custom={2} variants={inputVariants} initial="hidden" animate="visible">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={showPassword}
+                      onChange={(e) => setShowPassword(e.target.checked)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <span className="ml-2 text-sm text-gray-600">Show password</span>
+                  </label>
+                  <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                    Forgot password?
+                  </Link>
+                </div>
+              </motion.div>
+
+              <motion.div custom={3} variants={inputVariants} initial="hidden" animate="visible">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    I am a:
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setRole("parent")}
+                      className={`p-3 rounded-xl border-2 transition-all duration-200 ${
+                        role === "parent"
+                          ? "border-blue-600 bg-blue-50 text-blue-700"
+                          : "border-gray-200 text-gray-600 hover:border-gray-300"
+                      }`}
+                    >
+                      <div className="text-lg mb-1">👨‍👩‍👧‍👦</div>
+                      <div className="text-sm font-medium">Parent</div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRole("provider")}
+                      className={`p-3 rounded-xl border-2 transition-all duration-200 ${
+                        role === "provider"
+                          ? "border-blue-600 bg-blue-50 text-blue-700"
+                          : "border-gray-200 text-gray-600 hover:border-gray-300"
+                      }`}
+                    >
+                      <div className="text-lg mb-1">🏢</div>
+                      <div className="text-sm font-medium">Provider</div>
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div custom={4} variants={inputVariants} initial="hidden" animate="visible">
+                <Button
+                  type="submit"
+                  loading={loading}
+                  fullWidth
+                  size="lg"
                 >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
-              </div>
-              <div className="text-right mt-1">
-                <Link href="/forgot-password" className="text-sm text-[#3B82F6] hover:underline">
-                  Forgot password?
-                </Link>
-              </div>
-            </motion.div>
-            <motion.div custom={2} variants={inputVariants} initial="hidden" animate="visible">
-              <label htmlFor="role" className="block text-sm font-medium text-[#111827] mb-1">
-                Role
-              </label>
-              <select
-                id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
-              >
-                <option value="parent">Parent</option>
-                <option value="provider">Provider</option>
-              </select>
-            </motion.div>
-            <motion.button
-              type="submit"
-              whileHover={{ scale: 1.03 }}
-              className="w-full bg-[#3B82F6] text-white py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 mt-2"
-              disabled={loading}
+                  {loading ? "Signing in..." : "Sign In"}
+                </Button>
+              </motion.div>
+            </form>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              className="mt-6 text-center"
             >
-              {loading ? (
-                <svg className="animate-spin h-5 w-5 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                </svg>
-              ) : (
-                "Login"
-              )}
-            </motion.button>
-          </form>
-          <div className="text-center text-sm text-gray-500 mt-4">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-[#3B82F6] hover:underline font-medium">Sign Up</Link>
-          </div>
+              <p className="text-gray-600">
+                Don't have an account?{" "}
+                <Link href="/signup" className="text-blue-600 hover:text-blue-800 font-semibold">
+                  Sign up
+                </Link>
+              </p>
+            </motion.div>
+          </motion.div>
         </motion.div>
       </AnimatePresence>
     </div>
