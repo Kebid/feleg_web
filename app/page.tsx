@@ -1,11 +1,12 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import { supabase } from "@/utils/supabaseClient";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -27,38 +28,12 @@ const itemVariants = {
   },
 };
 
-const featuredPrograms = [
-  {
-    id: "1",
-    title: "🧠 STEM Robotics Workshop",
-    description: "Learn coding and robotics through hands-on projects",
-    type: "STEM",
-    location: "San Francisco, CA",
-    cost: "$150",
-    featured: true,
-  },
-  {
-    id: "2", 
-    title: "🎨 Creative Arts & Design",
-    description: "Express yourself through painting, drawing, and digital art",
-    type: "Arts",
-    location: "New York, NY",
-    cost: "$120",
-    featured: false,
-  },
-  {
-    id: "3",
-    title: "⚽ Youth Soccer Academy",
-    description: "Develop skills, teamwork, and sportsmanship",
-    type: "Sports",
-    location: "Austin, TX",
-    cost: "$200",
-    featured: false,
-  },
-];
-
 export default function HomePage() {
   const router = useRouter();
+  const [featuredPrograms, setFeaturedPrograms] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   useEffect(() => {
     // router.replace("/login");
   }, [router]);
@@ -78,8 +53,45 @@ export default function HomePage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      setLoading(true);
+      setError("");
+      // Try to fetch up to 3 featured programs, fallback to latest 3 if none are marked featured
+      let { data, error } = await supabase
+        .from("programs")
+        .select("id, title, description, program_type, location, cost, featured")
+        .eq("featured", true)
+        .order("created_at", { ascending: false })
+        .limit(3);
+      if (error) {
+        setError("Failed to load featured programs");
+        setLoading(false);
+        return;
+      }
+      if (!data || data.length === 0) {
+        // fallback: get latest 3
+        const { data: fallback, error: fallbackError } = await supabase
+          .from("programs")
+          .select("id, title, description, program_type, location, cost, featured")
+          .order("created_at", { ascending: false })
+          .limit(3);
+        if (fallbackError) {
+          setError("Failed to load programs");
+          setLoading(false);
+          return;
+        }
+        setFeaturedPrograms(fallback || []);
+      } else {
+        setFeaturedPrograms(data);
+      }
+      setLoading(false);
+    };
+    fetchFeatured();
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 dark:from-blue-900/20 dark:to-purple-900/20"></div>
@@ -156,56 +168,67 @@ export default function HomePage() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredPrograms.map((program, index) => (
-              <motion.div
-                key={program.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card hover className="h-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-                  <div className="relative">
-                    {program.featured && (
-                      <div className="absolute -top-3 -right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-                        ✨ Featured
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+              <div className="text-gray-500">Loading featured programs...</div>
+            </div>
+          ) : error ? (
+            <div className="text-center text-red-500 py-8">{error}</div>
+          ) : featuredPrograms.length === 0 ? (
+            <div className="text-center text-gray-500 py-8">No featured programs available yet.</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredPrograms.map((program, index) => (
+                <motion.div
+                  key={program.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <Card hover className="h-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+                    <div className="relative">
+                      {program.featured && (
+                        <div className="absolute -top-3 -right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                          ✨ Featured
+                        </div>
+                      )}
+                      <div className="mb-4">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                          {program.title}
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-300 mb-4">
+                          {program.description}
+                        </p>
                       </div>
-                    )}
-                    <div className="mb-4">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                        {program.title}
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-300 mb-4">
-                        {program.description}
-                      </p>
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                          {program.program_type}
+                        </span>
+                        <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                          {program.cost}
+                        </span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        <span className="mr-2">📍</span>
+                        {program.location}
+                      </div>
+                      <Link href={`/programs/${program.id}`}>
+                        <motion.button
+                          className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition-all duration-300 dark:bg-blue-700 dark:hover:bg-blue-800"
+                          whileHover={{ scale: 1.03, y: -2 }}
+                          whileTap={{ scale: 0.97 }}
+                        >
+                          Learn More
+                        </motion.button>
+                      </Link>
                     </div>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                        {program.type}
-                      </span>
-                      <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                        {program.cost}
-                      </span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
-                      <span className="mr-2">📍</span>
-                      {program.location}
-                    </div>
-                    <Link href={`/programs/${program.id}`}>
-                      <motion.button
-                        className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition-all duration-300 dark:bg-blue-700 dark:hover:bg-blue-800"
-                        whileHover={{ scale: 1.03, y: -2 }}
-                        whileTap={{ scale: 0.97 }}
-                      >
-                        Learn More
-                      </motion.button>
-                    </Link>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
