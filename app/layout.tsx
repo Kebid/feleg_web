@@ -4,7 +4,7 @@ import "./globals.css";
 import AppShell from "@/components/AppShell";
 import PageWrapper from "@/components/layout/PageWrapper";
 import ToastProvider from "@/components/providers/ToastProvider";
-import ThemeProvider from "@/components/providers/ThemeProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
