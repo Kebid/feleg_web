@@ -37,16 +37,16 @@ export default function ForgotPasswordPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB]">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <motion.div
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4 }}
-          className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-4 md:p-8 text-center"
+          className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 md:p-8 text-center"
         >
           <div className="text-6xl mb-4">📧</div>
-          <h2 className="text-2xl font-bold text-[#111827] mb-4">Check Your Email</h2>
-          <p className="text-gray-600 mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Check Your Email</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
             We've sent a password reset link to <strong>{email}</strong>
           </p>
           <p className="text-sm text-gray-500 mb-6">
@@ -72,21 +72,21 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB]">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <motion.div
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-4 md:p-8"
+        className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 md:p-8"
       >
-        <h2 className="text-2xl font-bold text-center text-[#111827] mb-2">Reset Password</h2>
-        <p className="text-center text-gray-600 mb-6">
+        <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-2">Reset Password</h2>
+        <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
           Enter your email address and we'll send you a link to reset your password.
         </p>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-[#111827] mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-900 dark:text-white mb-1">
               Email Address
             </label>
             <input
