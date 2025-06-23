@@ -4,16 +4,12 @@ import { motion } from 'framer-motion';
 import { useTheme } from '@/components/providers/ThemeProvider';
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
 
   if (!mounted) {
     return (
