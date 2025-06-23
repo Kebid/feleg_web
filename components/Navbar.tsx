@@ -151,11 +151,6 @@ export default function Navbar() {
                 Feleg
               </span>
             </Link>
-            {isAuthPage && (
-              <Link href="/" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 text-sm font-medium transition-colors">
-                ← Back to Home
-              </Link>
-            )}
           </motion.div>
           
           {/* Navigation Links */}
