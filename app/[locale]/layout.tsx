@@ -1,5 +1,5 @@
 import '../globals.css';
-import { NextIntlClientProvider, useMessages } from 'next-intl';
+import { NextIntlClientProvider } from 'next-intl';
 import { ReactNode } from 'react';
 import { notFound } from 'next/navigation';
 import { Geist, Geist_Mono } from "next/font/google";
@@ -18,6 +18,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Fallback messages in case the locale file is not found
+const fallbackMessages = {
+  welcome: "Welcome",
+  login: "Login",
+  signup: "Sign Up",
+  applyNow: "Apply Now",
+  language: "Language"
+};
+
 export default async function LocaleLayout({
   children,
   params: { locale }
@@ -29,7 +38,8 @@ export default async function LocaleLayout({
   try {
     messages = (await import(`../../messages/${locale}.json`)).default;
   } catch (error) {
-    notFound();
+    // Use fallback messages instead of throwing notFound
+    messages = fallbackMessages;
   }
 
   return (
