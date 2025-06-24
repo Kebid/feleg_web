@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
 import ThemeToggle from "@/components/ui/ThemeToggle";
-import LocaleSwitcher from "@/components/LocaleSwitcher";
+// import LocaleSwitcher from "@/components/LocaleSwitcher";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -171,7 +171,7 @@ export default function Navbar() {
           {/* User Menu */}
           <div className="flex items-center gap-4">
             <ThemeToggle />
-            <LocaleSwitcher />
+            {/* <LocaleSwitcher /> */}
             {loading && !(pathname.startsWith("/login") || pathname.startsWith("/signup") || pathname.startsWith("/forgot-password") || pathname.startsWith("/reset-password")) ? (
               <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
             ) : user ? (

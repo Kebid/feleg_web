@@ -1,7 +1,6 @@
 import '../globals.css';
 import { NextIntlClientProvider } from 'next-intl';
 import { ReactNode } from 'react';
-import { notFound } from 'next/navigation';
 import { Geist, Geist_Mono } from "next/font/google";
 import AppShell from "@/components/AppShell";
 import PageWrapper from "@/components/layout/PageWrapper";
@@ -18,7 +17,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Fallback messages in case the locale file is not found
+// Fallback messages
 const fallbackMessages = {
   welcome: "Welcome",
   login: "Login",
@@ -34,12 +33,13 @@ export default async function LocaleLayout({
   children: ReactNode;
   params: { locale: string }
 }) {
-  let messages;
+  let messages = fallbackMessages;
+  
   try {
-    messages = (await import(`../../messages/${locale}.json`)).default;
+    const importedMessages = await import(`../../messages/${locale}.json`);
+    messages = importedMessages.default;
   } catch (error) {
-    // Use fallback messages instead of throwing notFound
-    messages = fallbackMessages;
+    console.log(`Could not load messages for locale: ${locale}, using fallback`);
   }
 
   return (
