@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { redirect } from "next/navigation";
 import AppShell from "@/components/AppShell";
 import PageWrapper from "@/components/layout/PageWrapper";
 import ToastProvider from "@/components/providers/ToastProvider";
@@ -26,18 +27,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className={`bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col ${geistSans.variable} ${geistMono.variable}`}>
-        <ThemeProvider>
-          <ToastProvider />
-          <AppShell>
-            <PageWrapper>
-              {children}
-            </PageWrapper>
-          </AppShell>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+  // Redirect to default locale
+  redirect('/en');
 }
