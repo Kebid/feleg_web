@@ -1,23 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { i18nMiddleware } from './src/i18n';
 
-const locales = ['en', 'am', 'om', 'ti'];
-const defaultLocale = 'en';
-
-export function middleware(request: NextRequest) {
-  // Get the pathname from the request
-  const pathname = request.nextUrl.pathname;
-
-  // Check if the pathname already has a locale
-  const pathnameHasLocale = locales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-  );
-
-  if (pathnameHasLocale) return;
-
-  // Redirect to default locale if no locale is present
-  const newUrl = new URL(`/${defaultLocale}${pathname}`, request.url);
-  return NextResponse.redirect(newUrl);
-}
+export default i18nMiddleware;
 
 export const config = {
   matcher: [
