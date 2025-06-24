@@ -1,3 +1,4 @@
+// Next-intl middleware configuration for i18n support
 import createI18nMiddleware from 'next-intl/middleware';
 
 export const locales = ['en', 'am', 'om', 'ti'] as const;
