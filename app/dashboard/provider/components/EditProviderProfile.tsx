@@ -15,6 +15,11 @@ interface ProviderProfileForm {
   website: string;
   phone: string;
   profile_image_url?: string;
+  specialties: string[];
+  facebook_url?: string;
+  instagram_url?: string;
+  twitter_url?: string;
+  linkedin_url?: string;
 }
 
 export default function EditProviderProfile() {
@@ -25,7 +30,12 @@ export default function EditProviderProfile() {
     bio: "",
     website: "",
     phone: "",
-    profile_image_url: ""
+    profile_image_url: "",
+    specialties: [],
+    facebook_url: "",
+    instagram_url: "",
+    twitter_url: "",
+    linkedin_url: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -63,7 +73,12 @@ export default function EditProviderProfile() {
             bio: data.bio || "",
             website: data.website || "",
             phone: data.phone || "",
-            profile_image_url: data.profile_image_url || ""
+            profile_image_url: data.profile_image_url || "",
+            specialties: data.specialties || [],
+            facebook_url: data.facebook_url || "",
+            instagram_url: data.instagram_url || "",
+            twitter_url: data.twitter_url || "",
+            linkedin_url: data.linkedin_url || "",
           });
         }
       } catch (error) {
@@ -139,6 +154,11 @@ export default function EditProviderProfile() {
           website: form.website.trim() || null,
           phone: form.phone.trim() || null,
           profile_image_url: form.profile_image_url?.trim() || null,
+          specialties: form.specialties,
+          facebook_url: form.facebook_url?.trim() || null,
+          instagram_url: form.instagram_url?.trim() || null,
+          twitter_url: form.twitter_url?.trim() || null,
+          linkedin_url: form.linkedin_url?.trim() || null,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
@@ -164,6 +184,20 @@ export default function EditProviderProfile() {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
   };
+
+  async function handleImageUpload(file: File) {
+    if (!user) return;
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}_${Date.now()}.${fileExt}`;
+    const { data, error } = await supabase.storage.from('profile-images').upload(fileName, file, { upsert: true });
+    if (error) {
+      toast.error('Failed to upload image');
+      return;
+    }
+    const { data: urlData } = supabase.storage.from('profile-images').getPublicUrl(fileName);
+    setForm(f => ({ ...f, profile_image_url: urlData.publicUrl }));
+    toast.success('Profile image uploaded!');
+  }
 
   if (loading) {
     return (
@@ -294,6 +328,79 @@ export default function EditProviderProfile() {
               <p className="mt-2 text-sm text-gray-500">
                 Share your story and what parents can expect from your programs
               </p>
+            </div>
+          </div>
+
+          {/* Specialties Tag Input */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Specialties</label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {form.specialties.map((tag, idx) => (
+                <span key={idx} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  {tag}
+                  <button type="button" className="ml-2 text-red-500" onClick={() => setForm(f => ({ ...f, specialties: f.specialties.filter((_, i) => i !== idx) }))}>&times;</button>
+                </span>
+              ))}
+            </div>
+            <input
+              type="text"
+              placeholder="Add a specialty and press Enter"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onKeyDown={e => {
+                if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                  e.preventDefault();
+                  setForm(f => ({ ...f, specialties: [...f.specialties, e.currentTarget.value.trim()] }));
+                  e.currentTarget.value = '';
+                }
+              }}
+            />
+          </div>
+
+          {/* Social Links Section */}
+          <div className="space-y-6 pt-6 border-t border-gray-200">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-blue-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold">🔗</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">Social Links</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Input label="Facebook URL" type="url" value={form.facebook_url} onChange={e => handleChange('facebook_url', e.target.value)} icon="📘" />
+              <Input label="Instagram URL" type="url" value={form.instagram_url} onChange={e => handleChange('instagram_url', e.target.value)} icon="📸" />
+              <Input label="Twitter URL" type="url" value={form.twitter_url} onChange={e => handleChange('twitter_url', e.target.value)} icon="🐦" />
+              <Input label="LinkedIn URL" type="url" value={form.linkedin_url} onChange={e => handleChange('linkedin_url', e.target.value)} icon="💼" />
+            </div>
+          </div>
+
+          {/* Profile Image Upload */}
+          <div className="space-y-2 pt-6 border-t border-gray-200">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Profile Image</label>
+            <div
+              className="w-full flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-4 cursor-pointer hover:border-blue-400 transition"
+              onDragOver={e => e.preventDefault()}
+              onDrop={async e => {
+                e.preventDefault();
+                const file = e.dataTransfer.files[0];
+                if (file) await handleImageUpload(file);
+              }}
+              onClick={() => document.getElementById('profile-image-upload')?.click()}
+            >
+              {form.profile_image_url ? (
+                <img src={form.profile_image_url} alt="Profile" className="w-24 h-24 rounded-full object-cover mb-2" />
+              ) : (
+                <span className="text-gray-400">Drag & drop or click to upload</span>
+              )}
+              <input
+                id="profile-image-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async e => {
+                  if (e.target.files && e.target.files[0]) {
+                    await handleImageUpload(e.target.files[0]);
+                  }
+                }}
+              />
             </div>
           </div>
 
