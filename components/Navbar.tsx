@@ -23,13 +23,6 @@ export default function Navbar() {
       try {
         console.log("Getting user from Supabase...");
         
-        if (!supabase) {
-          console.error("Supabase client not available!");
-          setUser(null);
-          setProfile(null);
-          return;
-        }
-        
         // Use getSession instead of getUser to avoid AuthSessionMissingError
         const { data: { session }, error } = await supabase.auth.getSession();
         console.log("Session data:", session, "Error:", error);
@@ -41,7 +34,7 @@ export default function Navbar() {
         } else {
           setUser(session?.user || null);
           
-          if (session?.user && supabase) {
+          if (session?.user) {
             console.log("Fetching profile for user:", session.user.id);
             const { data: profileData, error: profileError } = await supabase
               .from("profiles")
@@ -76,45 +69,39 @@ export default function Navbar() {
       clearTimeout(timeoutId);
     });
 
-    if (supabase) {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-        console.log("Auth state changed:", event, session?.user?.id);
-        setLoading(true);
-        setUser(session?.user ?? null);
-        
-        if (session?.user && supabase) {
-          try {
-            const { data: profileData, error } = await supabase
-              .from("profiles")
-              .select("*")
-              .eq("id", session.user.id)
-              .single();
-            
-            if (!error && profileData) {
-              setProfile(profileData);
-            }
-          } catch (error) {
-            console.error("Error fetching profile:", error);
-          } finally {
-            setLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session?.user?.id);
+      setLoading(true);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        try {
+          const { data: profileData, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+          
+          if (!error && profileData) {
+            setProfile(profileData);
           }
-        } else {
-          setProfile(null);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        } finally {
           setLoading(false);
         }
-      });
+      } else {
+        setProfile(null);
+        setLoading(false);
+      }
+    });
 
-      return () => subscription.unsubscribe();
-    }
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleLogout = async () => {
     try {
       setSigningOut(true);
-      if (!supabase) {
-        toast.error("Supabase client not available");
-        return;
-      }
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error("Sign out error:", error);
