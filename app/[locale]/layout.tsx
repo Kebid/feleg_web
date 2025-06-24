@@ -43,21 +43,13 @@ export default async function LocaleLayout({
     // Validate locale
     const validLocales = ['en', 'am', 'om', 'ti'];
     if (!validLocales.includes(locale)) {
-      console.warn(`Invalid locale: ${locale}, falling back to 'en'`);
       locale = 'en';
     }
     
-    // Try to import messages with better error handling
-    try {
-      const importedMessages = await import(`../../messages/${locale}.json`);
-      messages = importedMessages.default || fallbackMessages;
-    } catch (importError) {
-      console.warn(`Could not load messages for locale: ${locale}, using fallback`, importError);
-      messages = fallbackMessages;
-    }
+    // Use fallback messages for now to avoid chunk loading issues
+    messages = fallbackMessages;
   } catch (error) {
     console.error('Error in LocaleLayout:', error);
-    // Use fallback values
     locale = 'en';
     messages = fallbackMessages;
   }
