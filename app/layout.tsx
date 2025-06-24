@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { redirect } from "next/navigation";
-import AppShell from "@/components/AppShell";
-import PageWrapper from "@/components/layout/PageWrapper";
-import ToastProvider from "@/components/providers/ToastProvider";
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +22,5 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Redirect to default locale
-  redirect('/en');
+  return children;
 }
