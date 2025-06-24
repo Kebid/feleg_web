@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "../../components/Input";
+import Input from '@/components/ui/Input';
 
 const inputVariants = {
   hidden: { opacity: 0, y: 24 },

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import type { FieldError } from 'react-hook-form';
 
 interface InputProps {
   label?: string;
@@ -10,7 +11,7 @@ interface InputProps {
   name?: string;
   required?: boolean;
   disabled?: boolean;
-  error?: string;
+  error?: string | FieldError;
   className?: string;
   icon?: React.ReactNode;
 }
@@ -31,8 +32,10 @@ export default function Input({
   const [isFocused, setIsFocused] = useState(false);
   const hasValue = value && value.toString().length > 0;
 
+  const errorMessage = typeof error === 'string' ? error : error?.message;
+
   const baseClasses = 'w-full px-4 py-4 border-2 rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2';
-  const errorClasses = error ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:border-blue-500';
+  const errorClasses = errorMessage ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:border-blue-500';
   const disabledClasses = disabled ? 'bg-gray-50 cursor-not-allowed' : 'bg-white hover:border-gray-300';
   
   const classes = `${baseClasses} ${errorClasses} ${disabledClasses} ${className}`;
@@ -78,14 +81,14 @@ export default function Input({
         />
       </div>
       
-      {error && (
+      {errorMessage && (
         <motion.p 
           className="text-sm text-red-600 font-medium"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
         >
-          {error}
+          {errorMessage}
         </motion.p>
       )}
     </div>
