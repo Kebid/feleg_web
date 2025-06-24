@@ -1,15 +1,16 @@
 // src/i18n.ts
-import createMiddleware from 'next-intl/middleware';
+import {createMiddleware} from 'next-intl/server';
 
 export const locales = ['en', 'am', 'om', 'ti'] as const;
 export const defaultLocale = 'en';
 
-export default createMiddleware({
+const intlMiddleware = createMiddleware({
   locales,
-  defaultLocale,
+  defaultLocale
 });
 
+export default intlMiddleware;
+
 export const config = {
-  // Match only routes that start with a locale
   matcher: ['/', '/(en|am|om|ti)/:path*']
-}; 
+};

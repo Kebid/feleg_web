@@ -1,1 +1,2 @@
-export { default, config } from './src/i18n';
+// middleware.ts
+export {default, config} from './src/i18n';
