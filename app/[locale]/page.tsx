@@ -30,11 +30,28 @@ const itemVariants = {
 };
 
 export default function HomePage() {
-  const t = useTranslations();
   const router = useRouter();
   const [featuredPrograms, setFeaturedPrograms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  // Safe translation hook with fallback
+  let t: any;
+  try {
+    t = useTranslations();
+  } catch (translationError) {
+    console.warn('Translation hook failed, using fallback:', translationError);
+    t = (key: string) => {
+      const fallbacks: { [key: string]: string } = {
+        'welcome': 'Welcome',
+        'applyNow': 'Apply Now',
+        'signup': 'Sign Up',
+        'login': 'Login',
+        'language': 'Language'
+      };
+      return fallbacks[key] || key;
+    };
+  }
 
   useEffect(() => {
     // router.replace("/login");

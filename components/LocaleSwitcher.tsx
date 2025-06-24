@@ -11,8 +11,16 @@ const locales = [
 
 export default function LocaleSwitcher() {
   const pathname = usePathname();
-  const currentLocale = useLocale();
   const router = useRouter();
+  
+  // Safe locale hook with fallback
+  let currentLocale = 'en';
+  try {
+    currentLocale = useLocale();
+  } catch (localeError) {
+    console.warn('Locale hook failed, using fallback:', localeError);
+    currentLocale = 'en';
+  }
 
   const handleLocaleChange = (locale: string) => {
     // Remove the current locale from the pathname and add the new one

@@ -33,14 +33,33 @@ export default async function LocaleLayout({
   children: ReactNode;
   params: Promise<{ locale: string }>;
 }) {
-  const { locale } = await params;
+  let locale = 'en';
   let messages = fallbackMessages;
   
   try {
-    const importedMessages = await import(`../../messages/${locale}.json`);
-    messages = importedMessages.default;
+    const resolvedParams = await params;
+    locale = resolvedParams.locale || 'en';
+    
+    // Validate locale
+    const validLocales = ['en', 'am', 'om', 'ti'];
+    if (!validLocales.includes(locale)) {
+      console.warn(`Invalid locale: ${locale}, falling back to 'en'`);
+      locale = 'en';
+    }
+    
+    // Try to import messages with better error handling
+    try {
+      const importedMessages = await import(`../../messages/${locale}.json`);
+      messages = importedMessages.default || fallbackMessages;
+    } catch (importError) {
+      console.warn(`Could not load messages for locale: ${locale}, using fallback`, importError);
+      messages = fallbackMessages;
+    }
   } catch (error) {
-    console.log(`Could not load messages for locale: ${locale}, using fallback`);
+    console.error('Error in LocaleLayout:', error);
+    // Use fallback values
+    locale = 'en';
+    messages = fallbackMessages;
   }
 
   return (
