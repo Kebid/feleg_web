@@ -1,28 +1,53 @@
 "use client";
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabaseClient";
+import { Skeleton } from '@/components/ui';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const programTypes = ["STEM", "Arts", "Sports", "Other"];
 const deliveryModes = ["Online", "In-Person"];
 const ageGroups = ["5-8", "9-12", "13-15", "16-18"];
 
+const postProgramSchema = z.object({
+  title: z.string().min(2, 'Title is required'),
+  description: z.string().min(10, 'Description is required'),
+  location: z.string().min(2, 'Location is required'),
+  type: z.string().min(2, 'Type is required'),
+  delivery: z.string().min(2, 'Delivery mode is required'),
+  duration: z.string().min(1, 'Duration is required'),
+  ageGroup: z.string().min(1, 'Age group is required'),
+  cost: z.string().min(1, 'Cost is required'),
+  date: z.string().min(1, 'Date/Deadline is required'),
+});
+
+type PostProgramForm = z.infer<typeof postProgramSchema>;
+
 export default function PostProgram() {
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    location: "",
-    type: "STEM",
-    delivery: "Online",
-    duration: "",
-    ageGroup: "5-8",
-    cost: "",
-    date: "",
-    media: null as File | null,
-  });
-  const [errors, setErrors] = useState<any>({});
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<PostProgramForm>({
+    resolver: zodResolver(postProgramSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      location: '',
+      type: 'STEM',
+      delivery: 'Online',
+      duration: '',
+      ageGroup: '5-8',
+      cost: '',
+      date: '',
+    },
+  });
 
   useEffect(() => {
     const getUser = async () => {
@@ -32,68 +57,47 @@ export default function PostProgram() {
     getUser();
   }, []);
 
-  const validate = () => {
-    const errs: any = {};
-    if (!form.title) errs.title = "Title is required.";
-    if (!form.description) errs.description = "Description is required.";
-    if (!form.location) errs.location = "Location is required.";
-    if (!form.duration) errs.duration = "Duration is required.";
-    if (!form.cost) errs.cost = "Cost is required.";
-    if (!form.date) errs.date = "Date/Deadline is required.";
-    return errs;
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, files } = e.target as any;
-    if (name === "media") {
-      setForm({ ...form, media: files[0] || null });
-    } else {
-      setForm({ ...form, [name]: value });
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
-    setSuccess(false);
-    const errs = validate();
-    if (Object.keys(errs).length > 0) {
-      setErrors(errs);
-      return;
-    }
+  const onSubmit = async (data: PostProgramForm) => {
     setSubmitting(true);
-    // Insert into Supabase
-    const { error } = await supabase.from("programs").insert({
-      title: form.title,
-      description: form.description,
-      location: form.location,
-      program_type: form.type,
-      delivery_mode: form.delivery,
-      duration: form.duration,
-      age_group: form.ageGroup,
-      cost: form.cost,
+    setSuccess(false);
+    const { error } = await supabase.from('programs').insert({
+      title: data.title,
+      description: data.description,
+      location: data.location,
+      program_type: data.type,
+      delivery_mode: data.delivery,
+      duration: data.duration,
+      age_group: data.ageGroup,
+      cost: data.cost,
       provider_id: userId,
+      date: data.date,
     });
     if (error) {
-      setErrors({ submit: error.message });
+      // Show error toast or message if needed
       setSubmitting(false);
       return;
     }
     setSuccess(true);
-    setForm({
-      title: "",
-      description: "",
-      location: "",
-      type: "STEM",
-      delivery: "Online",
-      duration: "",
-      ageGroup: "5-8",
-      cost: "",
-      date: "",
-      media: null,
-    });
+    reset();
     setSubmitting(false);
   };
+
+  if (submitting) {
+    return (
+      <div className="max-w-xl mx-auto p-4">
+        <div className="bg-white rounded shadow p-6">
+          <Skeleton width="220px" height="32px" className="mb-4" />
+          {[...Array(7)].map((_, i) => (
+            <div key={i} className="mb-4">
+              <Skeleton width="120px" height="18px" className="mb-2" />
+              <Skeleton width="100%" height="38px" />
+            </div>
+          ))}
+          <Skeleton width="120px" height="38px" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-xl mx-auto p-4">
@@ -102,49 +106,38 @@ export default function PostProgram() {
         {success && (
           <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">Program posted successfully!</div>
         )}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label className="block font-semibold mb-1">Program Title *</label>
             <input
               type="text"
-              name="title"
-              value={form.title}
-              onChange={handleChange}
+              {...register("title")}
               className="w-full border p-2 rounded"
-              required
             />
-            {errors.title && <div className="text-red-500 text-sm mt-1">{errors.title}</div>}
+            {errors.title && <div className="text-red-500 text-sm mt-1">{errors.title.message}</div>}
           </div>
           <div>
             <label className="block font-semibold mb-1">Description *</label>
             <textarea
-              name="description"
-              value={form.description}
-              onChange={handleChange}
+              {...register('description')}
               className="w-full border p-2 rounded"
               rows={3}
-              required
             />
-            {errors.description && <div className="text-red-500 text-sm mt-1">{errors.description}</div>}
+            {errors.description && <div className="text-red-500 text-sm mt-1">{errors.description.message}</div>}
           </div>
           <div>
             <label className="block font-semibold mb-1">Location *</label>
             <input
               type="text"
-              name="location"
-              value={form.location}
-              onChange={handleChange}
+              {...register('location')}
               className="w-full border p-2 rounded"
-              required
             />
-            {errors.location && <div className="text-red-500 text-sm mt-1">{errors.location}</div>}
+            {errors.location && <div className="text-red-500 text-sm mt-1">{errors.location.message}</div>}
           </div>
           <div>
             <label className="block font-semibold mb-1">Program Type *</label>
             <select
-              name="type"
-              value={form.type}
-              onChange={handleChange}
+              {...register('type')}
               className="w-full border p-2 rounded"
             >
               {programTypes.map((type) => (
@@ -155,9 +148,7 @@ export default function PostProgram() {
           <div>
             <label className="block font-semibold mb-1">Delivery Mode *</label>
             <select
-              name="delivery"
-              value={form.delivery}
-              onChange={handleChange}
+              {...register('delivery')}
               className="w-full border p-2 rounded"
             >
               {deliveryModes.map((mode) => (
@@ -169,20 +160,15 @@ export default function PostProgram() {
             <label className="block font-semibold mb-1">Duration *</label>
             <input
               type="text"
-              name="duration"
-              value={form.duration}
-              onChange={handleChange}
+              {...register('duration')}
               className="w-full border p-2 rounded"
-              required
             />
-            {errors.duration && <div className="text-red-500 text-sm mt-1">{errors.duration}</div>}
+            {errors.duration && <div className="text-red-500 text-sm mt-1">{errors.duration.message}</div>}
           </div>
           <div>
             <label className="block font-semibold mb-1">Age Group *</label>
             <select
-              name="ageGroup"
-              value={form.ageGroup}
-              onChange={handleChange}
+              {...register('ageGroup')}
               className="w-full border p-2 rounded"
             >
               {ageGroups.map((age) => (
@@ -194,25 +180,19 @@ export default function PostProgram() {
             <label className="block font-semibold mb-1">Cost *</label>
             <input
               type="text"
-              name="cost"
-              value={form.cost}
-              onChange={handleChange}
+              {...register('cost')}
               className="w-full border p-2 rounded"
-              required
             />
-            {errors.cost && <div className="text-red-500 text-sm mt-1">{errors.cost}</div>}
+            {errors.cost && <div className="text-red-500 text-sm mt-1">{errors.cost.message}</div>}
           </div>
           <div>
             <label className="block font-semibold mb-1">Date/Deadline *</label>
             <input
               type="date"
-              name="date"
-              value={form.date}
-              onChange={handleChange}
+              {...register('date')}
               className="w-full border p-2 rounded"
-              required
             />
-            {errors.date && <div className="text-red-500 text-sm mt-1">{errors.date}</div>}
+            {errors.date && <div className="text-red-500 text-sm mt-1">{errors.date.message}</div>}
           </div>
           <button
             type="submit"
@@ -221,7 +201,6 @@ export default function PostProgram() {
           >
             {submitting ? "Posting..." : "Post Program"}
           </button>
-          {errors.submit && <div className="text-red-500 text-sm mt-1">{errors.submit}</div>}
         </form>
       </div>
     </div>

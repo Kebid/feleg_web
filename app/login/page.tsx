@@ -7,79 +7,82 @@ import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const inputVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: 0.15 + i * 0.08 } }),
 };
 
+const loginSchema = z.object({
+  email: z.string().email("Invalid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  role: z.enum(["parent", "provider"]),
+});
+
+type LoginForm = z.infer<typeof loginSchema>;
+
 export default function LoginPage() {
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState("parent");
   const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    watch,
+  } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      role: "parent",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: LoginForm) => {
     setLoading(true);
-    
     try {
-      // Login user
-      const { data, error: loginError } = await supabase.auth.signInWithPassword({
-        email: form.email,
-        password: form.password,
+      const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
       });
-      if (loginError || !data.user) {
+      if (loginError || !loginData.user) {
         toast.error(loginError?.message || "Login failed");
         return;
       }
-      
-      // Fetch profile
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("role")
-        .eq("id", data.user.id)
+        .eq("id", loginData.user.id)
         .maybeSingle();
-      
       if (profileError) {
-        console.error("Profile fetch error:", profileError);
         toast.error("Failed to load profile");
         return;
       }
-      
       if (!profile) {
-        // Profile doesn't exist, create one
-        console.log("Creating profile for user:", data.user.id);
         const { error: insertError } = await supabase.from("profiles").insert({
-          id: data.user.id,
-          name: data.user.email?.split('@')[0] || 'New User',
-          email: data.user.email || '',
-          role: role, // Use the role selected in the form
+          id: loginData.user.id,
+          name: loginData.user.email?.split('@')[0] || 'New User',
+          email: loginData.user.email || '',
+          role: data.role,
         });
-        
         if (insertError) {
-          console.error("Profile creation error:", insertError);
           toast.error("Failed to create profile");
           return;
         }
-        
-        // Redirect based on selected role
         toast.success("Welcome! Your profile has been created.");
-        if (role === "parent") {
+        if (data.role === "parent") {
           router.push("/dashboard/parent");
         } else {
           router.push("/dashboard/provider");
         }
       } else {
-        // Profile exists, redirect based on stored role
         toast.success("Welcome back!");
         if (profile.role === "parent") {
           router.push("/dashboard/parent");
@@ -90,7 +93,6 @@ export default function LoginPage() {
         }
       }
     } catch (error) {
-      console.error("Unexpected error during login:", error);
       toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -145,31 +147,29 @@ export default function LoginPage() {
             transition={{ delay: 0.5 }}
             className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700"
           >
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <motion.div custom={0} variants={inputVariants} initial="hidden" animate="visible">
                 <Input
                   label="Email Address"
                   type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
+                  {...register("email")}
                   required
                   disabled={loading}
                   icon="📧"
                 />
+                {errors.email && <div className="text-red-500 text-sm mt-1">{errors.email.message}</div>}
               </motion.div>
 
               <motion.div custom={1} variants={inputVariants} initial="hidden" animate="visible">
                 <Input
                   label="Password"
                   type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
+                  {...register("password")}
                   required
                   disabled={loading}
                   icon="🔒"
                 />
+                {errors.password && <div className="text-red-500 text-sm mt-1">{errors.password.message}</div>}
               </motion.div>
 
               <motion.div custom={2} variants={inputVariants} initial="hidden" animate="visible">
@@ -197,42 +197,47 @@ export default function LoginPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
-                      onClick={() => setRole("parent")}
-                      className={`p-3 rounded-xl border-2 transition-all duration-200 ${
-                        role === "parent"
-                          ? "border-blue-600 bg-blue-50 text-blue-700"
-                          : "border-gray-200 text-gray-600 hover:border-gray-300"
-                      }`}
+                      className={`py-2 rounded-lg font-semibold border transition-colors ${watch("role") === "parent" ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-700 border-gray-300"}`}
+                      onClick={() => setValue("role", "parent")}
+                      disabled={loading}
                     >
-                      <div className="text-lg mb-1">👨‍👩‍👧‍👦</div>
-                      <div className="text-sm font-medium">Parent</div>
+                      Parent
                     </button>
                     <button
                       type="button"
-                      onClick={() => setRole("provider")}
-                      className={`p-3 rounded-xl border-2 transition-all duration-200 ${
-                        role === "provider"
-                          ? "border-blue-600 bg-blue-50 text-blue-700"
-                          : "border-gray-200 text-gray-600 hover:border-gray-300"
-                      }`}
+                      className={`py-2 rounded-lg font-semibold border transition-colors ${watch("role") === "provider" ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-700 border-gray-300"}`}
+                      onClick={() => setValue("role", "provider")}
+                      disabled={loading}
                     >
-                      <div className="text-lg mb-1">🏢</div>
-                      <div className="text-sm font-medium">Provider</div>
+                      Provider
                     </button>
                   </div>
+                  {errors.role && <div className="text-red-500 text-sm mt-1">{errors.role.message}</div>}
                 </div>
               </motion.div>
 
-              <motion.div custom={4} variants={inputVariants} initial="hidden" animate="visible">
-                <Button
-                  type="submit"
-                  loading={loading}
-                  fullWidth
-                  size="lg"
-                >
-                  {loading ? "Signing in..." : "Sign In"}
-                </Button>
-              </motion.div>
+              <motion.button
+                type="submit"
+                whileHover={{ scale: loading ? 1 : 1.03 }}
+                className={`w-full py-2 rounded-lg font-semibold shadow transition focus:outline-none focus:ring-2 focus:ring-offset-2 mt-2 ${
+                  loading
+                    ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                    : "bg-[#3B82F6] text-white hover:bg-blue-700 focus:ring-blue-300"
+                }`}
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Signing in...
+                  </div>
+                ) : (
+                  "Sign In"
+                )}
+              </motion.button>
             </form>
 
             <motion.div

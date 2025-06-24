@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/utils/supabaseClient";
+import { Skeleton } from '@/components/ui';
 
 function statusColor(status: string) {
   if (status === "Accepted") return "text-green-600 bg-green-100";
@@ -127,9 +128,31 @@ export default function Applications() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mb-4"></div>
-        <div className="text-gray-500">Loading applications...</div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white rounded-lg shadow">
+          <thead>
+            <tr className="border-b border-gray-200">
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Program</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Child Name</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Age</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Submitted</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[...Array(5)].map((_, i) => (
+              <tr key={i} className="border-b">
+                <td className="px-4 py-3"><Skeleton width="100px" height="20px" /></td>
+                <td className="px-4 py-3"><Skeleton width="80px" height="20px" /></td>
+                <td className="px-4 py-3"><Skeleton width="40px" height="20px" /></td>
+                <td className="px-4 py-3"><Skeleton width="70px" height="20px" /></td>
+                <td className="px-4 py-3"><Skeleton width="90px" height="20px" /></td>
+                <td className="px-4 py-3"><Skeleton width="60px" height="20px" /></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   }

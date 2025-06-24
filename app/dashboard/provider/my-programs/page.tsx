@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import Link from "next/link";
+import { Skeleton } from '@/components/ui';
 
 export default function MyProgramsPage() {
   const [programs, setPrograms] = useState<any[]>([]);
@@ -54,7 +55,32 @@ export default function MyProgramsPage() {
         <Link href="/dashboard/provider/post-program" className="text-blue-600 hover:underline">+ Post New Program</Link>
       </div>
       {loading ? (
-        <div className="text-center py-8 text-gray-500">Loading programs...</div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white rounded shadow">
+            <thead>
+              <tr>
+                <th className="px-4 py-2 text-left">Title</th>
+                <th className="px-4 py-2 text-left">Type</th>
+                <th className="px-4 py-2 text-left">Location</th>
+                <th className="px-4 py-2 text-left">Delivery</th>
+                <th className="px-4 py-2 text-left">Date</th>
+                <th className="px-4 py-2 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...Array(5)].map((_, i) => (
+                <tr key={i} className="border-t">
+                  <td className="px-4 py-2"><Skeleton width="100px" height="20px" /></td>
+                  <td className="px-4 py-2"><Skeleton width="80px" height="20px" /></td>
+                  <td className="px-4 py-2"><Skeleton width="80px" height="20px" /></td>
+                  <td className="px-4 py-2"><Skeleton width="80px" height="20px" /></td>
+                  <td className="px-4 py-2"><Skeleton width="70px" height="20px" /></td>
+                  <td className="px-4 py-2"><Skeleton width="60px" height="20px" /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : error ? (
         <div className="text-center py-8 text-red-500">{error}</div>
       ) : programs.length === 0 ? (

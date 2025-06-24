@@ -81,7 +81,34 @@ export default function MyPrograms() {
         <Link href="/dashboard/provider/post-program" className="text-blue-600 hover:underline">+ Post New Program</Link>
       </div>
       {loading ? (
-        <div className="text-center py-8 text-gray-500">Loading programs...</div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white rounded shadow animate-pulse">
+            <thead>
+              <tr>
+                <th className="px-4 py-2 text-left text-gray-300">Title</th>
+                <th className="px-4 py-2 text-left text-gray-300">Type</th>
+                <th className="px-4 py-2 text-left text-gray-300">Location</th>
+                <th className="px-4 py-2 text-left text-gray-300">Delivery</th>
+                <th className="px-4 py-2 text-left text-gray-300">Status</th>
+                <th className="px-4 py-2 text-left text-gray-300">Date</th>
+                <th className="px-4 py-2 text-left text-gray-300">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...Array(4)].map((_, i) => (
+                <tr key={i} className="border-t">
+                  <td className="px-4 py-4"><div className="h-4 w-24 bg-gray-200 rounded" /></td>
+                  <td className="px-4 py-4"><div className="h-4 w-16 bg-gray-200 rounded" /></td>
+                  <td className="px-4 py-4"><div className="h-4 w-20 bg-gray-200 rounded" /></td>
+                  <td className="px-4 py-4"><div className="h-4 w-16 bg-gray-200 rounded" /></td>
+                  <td className="px-4 py-4"><div className="h-4 w-14 bg-gray-200 rounded" /></td>
+                  <td className="px-4 py-4"><div className="h-4 w-16 bg-gray-200 rounded" /></td>
+                  <td className="px-4 py-4"><div className="h-8 w-20 bg-gray-200 rounded" /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : error ? (
         <div className="text-center py-8 text-red-500">{error}</div>
       ) : programs.length === 0 ? (

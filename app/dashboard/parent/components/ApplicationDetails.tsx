@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/utils/supabaseClient";
 import ViewProviderProfile from "@/components/ViewProviderProfile";
+import { Skeleton } from '@/components/ui';
 
 interface ApplicationDetailsProps {
   applicationId: string;
@@ -111,9 +112,30 @@ export default function ApplicationDetails({ applicationId, onClose }: Applicati
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
-        <div className="text-gray-500">Loading application details...</div>
+      <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <Skeleton width="200px" height="28px" />
+          <Skeleton width="32px" height="32px" rounded="rounded-full" />
+        </div>
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <Skeleton width="160px" height="20px" className="mb-2" />
+          <Skeleton width="120px" height="16px" />
+        </div>
+        <div className="mb-6">
+          <Skeleton width="140px" height="20px" className="mb-3" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i}>
+                <Skeleton width="100px" height="16px" className="mb-1" />
+                <Skeleton width="80%" height="20px" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mb-6">
+          <Skeleton width="160px" height="20px" className="mb-3" />
+          <Skeleton width="100%" height="60px" />
+        </div>
       </div>
     );
   }

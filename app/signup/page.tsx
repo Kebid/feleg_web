@@ -5,36 +5,58 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "../../components/Input";
 
 const inputVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: 0.15 + i * 0.08 } }),
 };
 
+const signupSchema = z.object({
+  name: z.string().min(2, "Name is required"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  role: z.enum(["parent", "provider"]),
+});
+
+type SignupForm = z.infer<typeof signupSchema>;
+
 export default function SignupPage() {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    role: "parent",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm<SignupForm>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      role: "parent",
+    },
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setValue(e.target.name, e.target.value);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
       // Step 1: Sign up the user
       const { data, error: signUpError } = await supabase.auth.signUp({
-        email: form.email,
-        password: form.password,
+        email: watch("email"),
+        password: watch("password"),
         options: {
           emailRedirectTo: `${window.location.origin}/login`,
         },
@@ -53,9 +75,9 @@ export default function SignupPage() {
         // Step 3: Insert the profile with the authenticated user's ID
         const { error: profileError } = await supabase.from("profiles").insert({
           id: data.user.id,
-          name: form.name,
-          email: form.email,
-          role: form.role,
+          name: watch("name"),
+          email: watch("email"),
+          role: watch("role"),
         });
 
         if (profileError) {
@@ -68,7 +90,7 @@ export default function SignupPage() {
         toast.success("Account created successfully!");
         
         // Redirect based on role
-        if (form.role === "parent") {
+        if (watch("role") === "parent") {
           router.push("/dashboard/parent");
         } else {
           router.push("/dashboard/provider");
@@ -94,17 +116,17 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB]">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.97 }}
           transition={{ duration: 0.4 }}
-          className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-4 md:p-8"
+          className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 md:p-8"
         >
-          <h2 className="text-2xl font-bold text-center text-[#111827] mb-6">Create Your Account</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">Create Your Account</h2>
+          <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-6">
             <motion.div custom={0} variants={inputVariants} initial="hidden" animate="visible">
               <label htmlFor="name" className="block text-sm font-medium text-[#111827] mb-1">
                 Name
@@ -112,30 +134,24 @@ export default function SignupPage() {
               <input
                 id="name"
                 type="text"
-                name="name"
+                {...register("name")}
                 placeholder="Your Name"
-                value={form.name}
-                onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
                 required
                 disabled={loading}
               />
+              {errors.name && <div className="text-red-500 text-sm mt-1">{errors.name.message}</div>}
             </motion.div>
             <motion.div custom={1} variants={inputVariants} initial="hidden" animate="visible">
-              <label htmlFor="email" className="block text-sm font-medium text-[#111827] mb-1">
-                Email
-              </label>
-              <input
-                id="email"
+              <Input
+                label="Email Address"
                 type="email"
-                name="email"
-                placeholder="you@email.com"
-                value={form.email}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+                {...register("email")}
                 required
                 disabled={loading}
+                icon="📧"
               />
+              {errors.email && <div className="text-red-500 text-sm mt-1">{errors.email.message}</div>}
             </motion.div>
             <motion.div custom={2} variants={inputVariants} initial="hidden" animate="visible">
               <label htmlFor="password" className="block text-sm font-medium text-[#111827] mb-1">
@@ -145,10 +161,8 @@ export default function SignupPage() {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  name="password"
+                  {...register("password")}
                   placeholder="••••••••"
-                  value={form.password}
-                  onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
                   required
                   disabled={loading}
@@ -164,6 +178,7 @@ export default function SignupPage() {
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
+              {errors.password && <div className="text-red-500 text-sm mt-1">{errors.password.message}</div>}
             </motion.div>
             <motion.div custom={3} variants={inputVariants} initial="hidden" animate="visible">
               <label htmlFor="role" className="block text-sm font-medium text-[#111827] mb-1">
@@ -171,15 +186,14 @@ export default function SignupPage() {
               </label>
               <select
                 id="role"
-                name="role"
-                value={form.role}
-                onChange={handleChange}
+                {...register("role")}
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
                 disabled={loading}
               >
                 <option value="parent">Parent</option>
                 <option value="provider">Provider</option>
               </select>
+              {errors.role && <div className="text-red-500 text-sm mt-1">{errors.role.message}</div>}
             </motion.div>
             <motion.button
               type="submit"

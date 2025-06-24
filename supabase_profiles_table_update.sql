@@ -9,7 +9,12 @@ ADD COLUMN IF NOT EXISTS website TEXT,
 ADD COLUMN IF NOT EXISTS phone TEXT,
 ADD COLUMN IF NOT EXISTS profile_image_url TEXT,
 ADD COLUMN IF NOT EXISTS location TEXT,
-ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
+ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+ADD COLUMN IF NOT EXISTS specialties TEXT[],
+ADD COLUMN IF NOT EXISTS facebook_url TEXT,
+ADD COLUMN IF NOT EXISTS instagram_url TEXT,
+ADD COLUMN IF NOT EXISTS twitter_url TEXT,
+ADD COLUMN IF NOT EXISTS linkedin_url TEXT;
 
 -- Create index for better performance on updated_at
 CREATE INDEX IF NOT EXISTS idx_profiles_updated_at ON profiles(updated_at);
