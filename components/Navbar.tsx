@@ -207,7 +207,7 @@ export default function Navbar() {
             animate="open"
             exit="exit"
             variants={menuVariants}
-            className="fixed top-0 left-0 w-4/5 max-w-xs h-full bg-white/80 dark:bg-gray-900/90 backdrop-blur-xl shadow-2xl z-[100] flex flex-col p-0"
+            className="fixed top-0 left-0 w-4/5 max-w-xs h-full bg-white/95 dark:bg-gray-900/95 backdrop-blur shadow-2xl z-[100] flex flex-col p-0"
             style={{ boxShadow: "8px 0 32px 0 rgba(0,0,0,0.15)" }}
           >
             <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-gray-800">
