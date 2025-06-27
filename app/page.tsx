@@ -92,15 +92,10 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="relative min-h-screen animated-gradient-bg overflow-hidden">
-      {/* Floating blobs */}
-      <div className="blob blob-1" />
-      <div className="blob blob-2" />
-      <div className="blob blob-3" />
-      
+    <div className="relative z-10">
       {/* Hero Section */}
-      <section className="relative z-10 overflow-hidden">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+      <section className="relative pt-20 pb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -156,7 +151,7 @@ export default function HomePage() {
       </section>
 
       {/* Featured Programs Section */}
-      <section className="relative z-10 py-20">
+      <section className="relative py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -238,12 +233,12 @@ export default function HomePage() {
       </section>
 
       {/* How Feleg Works Section */}
-      <section className="relative z-10">
+      <section className="relative">
         <HowFelegWorks />
       </section>
 
       {/* CTA Section */}
-      <section className="relative z-10 py-20">
+      <section className="relative py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

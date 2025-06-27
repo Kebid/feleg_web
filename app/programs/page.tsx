@@ -29,11 +29,7 @@ export default function BrowseProgramsPage() {
   }, []);
 
   return (
-    <div className="relative min-h-screen animated-gradient-bg overflow-hidden">
-      {/* Floating blobs */}
-      <div className="blob blob-1" />
-      <div className="blob blob-2" />
-      <div className="blob blob-3" />
+    <div className="relative min-h-screen">
       <div className="relative z-10 flex flex-col justify-center py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <h1 className="text-4xl font-bold text-center mb-8 text-gray-900 dark:text-white">Browse Programs</h1>

@@ -154,11 +154,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center animated-gradient-bg overflow-hidden p-4">
-      {/* Floating blobs */}
-      <div className="blob blob-1" />
-      <div className="blob blob-2" />
-      <div className="blob blob-3" />
+    <div className="relative min-h-screen flex items-center justify-center p-4">
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

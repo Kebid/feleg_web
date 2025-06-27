@@ -6,8 +6,6 @@ import { supabase } from "@/utils/supabaseClient";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
-import ThemeToggle from "@/components/ui/ThemeToggle";
-import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { HiOutlineUser } from "react-icons/hi2";
 import { FaRocket } from "react-icons/fa6";
 import { Menu, X, LogOut, User, LayoutDashboard, BookOpen, Globe } from 'lucide-react';
@@ -112,7 +110,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="bg-white/70 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200/40 dark:border-gray-700/40 shadow-md sticky top-0 z-50">
+      <nav className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl border-b border-white/20 dark:border-gray-700/20 shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -135,15 +133,12 @@ export default function Navbar() {
 
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-4">
-              <ThemeToggle className="w-8 h-4 scale-90 opacity-70" />
-              <div className="flex-1" />
-              <LocaleSwitcher className="w-16 h-7 text-xs px-1 py-0.5 rounded bg-white/60 dark:bg-gray-800/60 border border-gray-200/40 dark:border-gray-700/40 shadow-sm ml-2" />
               {loading && !["/login","/signup","/forgot-password","/reset-password"].some(p => pathname.startsWith(p)) ? (
                 <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
               ) : user ? (
                 <div className="flex items-center gap-3">
                   {/* User Avatar */}
-                  <motion.div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2" whileHover={{ scale: 1.02 }}>
+                  <motion.div className="flex items-center gap-3 bg-white/80 dark:bg-gray-800/80 rounded-xl px-4 py-2 backdrop-blur-md border border-white/20 dark:border-gray-700/20 shadow-lg" whileHover={{ scale: 1.02 }}>
                     <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
                       <span className="text-white font-semibold text-sm">
                         {profile?.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U"}
@@ -164,7 +159,7 @@ export default function Navbar() {
                     size="sm"
                     onClick={handleLogout}
                     loading={signingOut}
-                    className="hidden sm:flex"
+                    className="hidden sm:flex bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-white/20 dark:border-gray-700/20"
                   >
                     {signingOut ? "Signing out..." : "Sign out"}
                   </Button>
@@ -173,7 +168,7 @@ export default function Navbar() {
                 <>
                   <Link href="/login">
                     <button
-                      className="flex items-center gap-2 px-5 py-2 rounded-full bg-white/80 dark:bg-gray-800/80 border border-blue-600 text-blue-600 font-semibold shadow hover:bg-blue-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-blue-400 transition-all text-base backdrop-blur-md"
+                      className="flex items-center gap-2 px-5 py-2 rounded-full bg-white/80 dark:bg-gray-800/80 border border-blue-600 text-blue-600 font-semibold shadow-lg hover:bg-blue-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-blue-400 transition-all text-base backdrop-blur-md"
                     >
                       <HiOutlineUser className="text-lg" /> Sign in
                     </button>
@@ -191,7 +186,7 @@ export default function Navbar() {
 
             {/* Hamburger for Mobile */}
             <button
-              className="md:hidden flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition"
+              className="md:hidden flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-800/50 transition backdrop-blur-md"
               aria-label="Open menu"
               onClick={() => setMenuOpen(true)}
             >

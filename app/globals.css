@@ -31,14 +31,14 @@ body {
   }
   50% {
     background-position: 100% 50%;
-    filter: hue-rotate(30deg);
+    filter: hue-rotate(15deg);
   }
 }
 
 .animated-gradient-bg {
   background: linear-gradient(120deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
   background-size: 200% 200%;
-  animation: gradient-move 12s ease-in-out infinite;
+  animation: gradient-move 20s ease-in-out infinite;
 }
 
 .dark .animated-gradient-bg {
