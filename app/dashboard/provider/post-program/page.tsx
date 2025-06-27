@@ -99,146 +99,152 @@ export default function PostProgramPage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-4">
-      <div className="mb-4">
-        <Link href="/dashboard/provider/my-programs" className="text-blue-600 hover:underline">View My Programs</Link>
-      </div>
-      <div className="bg-white rounded shadow p-6">
-        <h1 className="text-2xl font-bold mb-4">Post a New Program</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block font-semibold mb-1">Program Title *</label>
-            <input
-              type="text"
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              required
-            />
-            {errors.title && <div className="text-red-500 text-sm mt-1">{errors.title}</div>}
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Description *</label>
-            <textarea
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              rows={3}
-              required
-            />
-            {errors.description && <div className="text-red-500 text-sm mt-1">{errors.description}</div>}
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Location *</label>
-            <input
-              type="text"
-              name="location"
-              value={form.location}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              required
-            />
-            {errors.location && <div className="text-red-500 text-sm mt-1">{errors.location}</div>}
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Program Type *</label>
-            <select
-              name="type"
-              value={form.type}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
+    <div className="relative min-h-screen animated-gradient-bg overflow-hidden">
+      {/* Floating blobs */}
+      <div className="blob blob-1" />
+      <div className="blob blob-2" />
+      <div className="blob blob-3" />
+      <div className="relative z-10 max-w-xl mx-auto p-4 py-12">
+        <div className="mb-4">
+          <Link href="/dashboard/provider/my-programs" className="text-blue-600 hover:underline">View My Programs</Link>
+        </div>
+        <div className="bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-2xl backdrop-blur-md p-6">
+          <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Post a New Program</h1>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block font-semibold mb-1">Program Title *</label>
+              <input
+                type="text"
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+                required
+              />
+              {errors.title && <div className="text-red-500 text-sm mt-1">{errors.title}</div>}
+            </div>
+            <div>
+              <label className="block font-semibold mb-1">Description *</label>
+              <textarea
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+                rows={3}
+                required
+              />
+              {errors.description && <div className="text-red-500 text-sm mt-1">{errors.description}</div>}
+            </div>
+            <div>
+              <label className="block font-semibold mb-1">Location *</label>
+              <input
+                type="text"
+                name="location"
+                value={form.location}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+                required
+              />
+              {errors.location && <div className="text-red-500 text-sm mt-1">{errors.location}</div>}
+            </div>
+            <div>
+              <label className="block font-semibold mb-1">Program Type *</label>
+              <select
+                name="type"
+                value={form.type}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+              >
+                {programTypes.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block font-semibold mb-1">Delivery Mode *</label>
+              <select
+                name="delivery"
+                value={form.delivery}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+              >
+                {deliveryModes.map((mode) => (
+                  <option key={mode} value={mode}>{mode}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block font-semibold mb-1">Duration *</label>
+              <input
+                type="text"
+                name="duration"
+                value={form.duration}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+                required
+              />
+              {errors.duration && <div className="text-red-500 text-sm mt-1">{errors.duration}</div>}
+            </div>
+            <div>
+              <label className="block font-semibold mb-1">Age Group *</label>
+              <select
+                name="ageGroup"
+                value={form.ageGroup}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+              >
+                {ageGroups.map((age) => (
+                  <option key={age} value={age}>{age}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block font-semibold mb-1">Cost *</label>
+              <input
+                type="text"
+                name="cost"
+                value={form.cost}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+                required
+              />
+              {errors.cost && <div className="text-red-500 text-sm mt-1">{errors.cost}</div>}
+            </div>
+            <div>
+              <label className="block font-semibold mb-1">Date/Deadline *</label>
+              <input
+                type="date"
+                name="date"
+                value={form.date}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+                required
+              />
+              {errors.date && <div className="text-red-500 text-sm mt-1">{errors.date}</div>}
+            </div>
+            <div>
+              <label className="block font-semibold mb-1">Media Upload (optional)</label>
+              <input
+                type="file"
+                name="media"
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+                accept="image/*"
+              />
+            </div>
+            <button
+              type="submit"
+              className={`w-full py-2 px-4 rounded font-semibold ${
+                submitting
+                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              }`}
+              disabled={submitting}
             >
-              {programTypes.map((type) => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Delivery Mode *</label>
-            <select
-              name="delivery"
-              value={form.delivery}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-            >
-              {deliveryModes.map((mode) => (
-                <option key={mode} value={mode}>{mode}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Duration *</label>
-            <input
-              type="text"
-              name="duration"
-              value={form.duration}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              required
-            />
-            {errors.duration && <div className="text-red-500 text-sm mt-1">{errors.duration}</div>}
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Age Group *</label>
-            <select
-              name="ageGroup"
-              value={form.ageGroup}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-            >
-              {ageGroups.map((age) => (
-                <option key={age} value={age}>{age}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Cost *</label>
-            <input
-              type="text"
-              name="cost"
-              value={form.cost}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              required
-            />
-            {errors.cost && <div className="text-red-500 text-sm mt-1">{errors.cost}</div>}
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Date/Deadline *</label>
-            <input
-              type="date"
-              name="date"
-              value={form.date}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              required
-            />
-            {errors.date && <div className="text-red-500 text-sm mt-1">{errors.date}</div>}
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Media Upload (optional)</label>
-            <input
-              type="file"
-              name="media"
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              accept="image/*"
-            />
-          </div>
-          <button
-            type="submit"
-            className={`w-full py-2 px-4 rounded font-semibold ${
-              submitting
-                ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
-            disabled={submitting}
-          >
-            {submitting ? "Posting..." : "Post Program"}
-          </button>
-        </form>
+              {submitting ? "Posting..." : "Post Program"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

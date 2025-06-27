@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { supabase } from "@/utils/supabaseClient";
+import HowFelegWorks from "@/components/HowFelegWorks";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -233,41 +234,7 @@ export default function HomePage() {
       </section>
 
       {/* How Feleg Works Section */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              How Feleg Works
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Simple steps to find and enroll in the perfect program
-            </p>
-          </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 text-center">
-              <div className="text-4xl mb-4">🔍</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Discover</h3>
-              <p className="text-gray-600 dark:text-gray-300">Browse programs by category, location, or age group</p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 text-center">
-              <div className="text-4xl mb-4">📝</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Apply</h3>
-              <p className="text-gray-600 dark:text-gray-300">Submit applications with just a few clicks</p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 text-center">
-              <div className="text-4xl mb-4">🎉</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Enroll</h3>
-              <p className="text-gray-600 dark:text-gray-300">Get accepted and start your child's journey</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HowFelegWorks />
 
       {/* CTA Section */}
       <div className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-800 dark:to-purple-900">

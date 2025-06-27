@@ -150,103 +150,121 @@ export default function ApplyPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-        <div className="text-gray-600">Loading...</div>
+      <div className="relative min-h-screen flex flex-col items-center justify-center animated-gradient-bg overflow-hidden p-4">
+        {/* Floating blobs */}
+        <div className="blob blob-1" />
+        <div className="blob blob-2" />
+        <div className="blob blob-3" />
+        <div className="relative z-10 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-2xl backdrop-blur-md p-6 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4 mx-auto"></div>
+          <div className="text-gray-600">Loading...</div>
+        </div>
       </div>
     );
   }
 
   if (!program) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="text-gray-500">Program not found.</div>
-        <Link href="/dashboard/parent" className="mt-4 text-blue-600 hover:underline">Back to Dashboard</Link>
+      <div className="relative min-h-screen flex flex-col items-center justify-center animated-gradient-bg overflow-hidden p-4">
+        {/* Floating blobs */}
+        <div className="blob blob-1" />
+        <div className="blob blob-2" />
+        <div className="blob blob-3" />
+        <div className="relative z-10 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-2xl backdrop-blur-md p-6 text-center">
+          <div className="text-gray-500">Program not found.</div>
+          <Link href="/dashboard/parent" className="mt-4 text-blue-600 hover:underline block">Back to Dashboard</Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center">
-      <div className="max-w-lg mx-auto p-4">
-        <div className="mb-4">
-          <Link href={`/programs/${id}`} className="text-blue-600 hover:underline">&larr; Back to Program</Link>
-        </div>
-        <Card className="p-0 md:p-0 bg-white/90 dark:bg-gray-900/90 shadow-xl rounded-2xl">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="p-8"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <AcademicCapIcon className="w-8 h-8 text-blue-500" />
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Apply to {program.title}</h1>
-            </div>
-            {/* Program Summary */}
-            <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-4 mb-6 flex items-center gap-4 border-none shadow-none">
-              <UserCircleIcon className="w-8 h-8 text-blue-400" />
-              <div>
-                <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-1">Program Details:</h3>
-                <div className="text-sm text-gray-700 dark:text-gray-200 space-y-1">
-                  <div><span className="font-medium">Type:</span> {program.program_type}</div>
-                  <div><span className="font-medium">Location:</span> {program.location}</div>
-                  <div><span className="font-medium">Age Group:</span> {program.age_group}</div>
-                  <div><span className="font-medium">Cost:</span> {program.cost}</div>
+    <div className="relative min-h-screen animated-gradient-bg overflow-hidden">
+      {/* Floating blobs */}
+      <div className="blob blob-1" />
+      <div className="blob blob-2" />
+      <div className="blob blob-3" />
+      <div className="relative z-10 flex flex-col justify-center py-12">
+        <div className="max-w-lg mx-auto p-4">
+          <div className="mb-4">
+            <Link href={`/programs/${id}`} className="text-blue-600 hover:underline">&larr; Back to Program</Link>
+          </div>
+          <Card className="p-0 md:p-0 bg-white/80 dark:bg-gray-900/80 shadow-2xl rounded-2xl backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="p-8"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <AcademicCapIcon className="w-8 h-8 text-blue-500" />
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Apply to {program.title}</h1>
+              </div>
+              {/* Program Summary */}
+              <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-4 mb-6 flex items-center gap-4 border-none shadow-none">
+                <UserCircleIcon className="w-8 h-8 text-blue-400" />
+                <div>
+                  <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-1">Program Details:</h3>
+                  <div className="text-sm text-gray-700 dark:text-gray-200 space-y-1">
+                    <div><span className="font-medium">Type:</span> {program.program_type}</div>
+                    <div><span className="font-medium">Location:</span> {program.location}</div>
+                    <div><span className="font-medium">Age Group:</span> {program.age_group}</div>
+                    <div><span className="font-medium">Cost:</span> {program.cost}</div>
+                  </div>
                 </div>
-              </div>
-            </Card>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">Child's Full Name *</label>
-                <input
-                  type="text"
-                  name="childName"
-                  value={form.childName}
-                  onChange={handleChange}
-                  className="w-full px-3 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                  required
+              </Card>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">Child's Full Name *</label>
+                  <input
+                    type="text"
+                    name="childName"
+                    value={form.childName}
+                    onChange={handleChange}
+                    className="w-full px-3 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    required
+                    disabled={submitting}
+                  />
+                  {errors.childName && <div className="text-red-500 text-sm mt-1">{errors.childName}</div>}
+                </div>
+                <div>
+                  <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">Child's Age *</label>
+                  <input
+                    type="number"
+                    name="childAge"
+                    value={form.childAge}
+                    onChange={handleChange}
+                    className="w-full px-3 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    required
+                    disabled={submitting}
+                  />
+                  {errors.childAge && <div className="text-red-500 text-sm mt-1">{errors.childAge}</div>}
+                </div>
+                <div>
+                  <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">Interests *</label>
+                  <textarea
+                    name="interests"
+                    value={form.interests}
+                    onChange={handleChange}
+                    className="w-full px-3 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    rows={3}
+                    required
+                    disabled={submitting}
+                  />
+                  {errors.interests && <div className="text-red-500 text-sm mt-1">{errors.interests}</div>}
+                </div>
+                <motion.button
+                  type="submit"
+                  whileHover={{ scale: 1.05 }}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold shadow hover:scale-105 transition-transform text-lg mt-2"
                   disabled={submitting}
-                />
-                {errors.childName && <div className="text-red-500 text-sm mt-1">{errors.childName}</div>}
-              </div>
-              <div>
-                <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">Child's Age *</label>
-                <input
-                  type="number"
-                  name="childAge"
-                  value={form.childAge}
-                  onChange={handleChange}
-                  className="w-full px-3 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                  required
-                  disabled={submitting}
-                />
-                {errors.childAge && <div className="text-red-500 text-sm mt-1">{errors.childAge}</div>}
-              </div>
-              <div>
-                <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">Interests *</label>
-                <textarea
-                  name="interests"
-                  value={form.interests}
-                  onChange={handleChange}
-                  className="w-full px-3 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                  rows={3}
-                  required
-                  disabled={submitting}
-                />
-                {errors.interests && <div className="text-red-500 text-sm mt-1">{errors.interests}</div>}
-              </div>
-              <motion.button
-                type="submit"
-                whileHover={{ scale: 1.05 }}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold shadow hover:scale-105 transition-transform text-lg mt-2"
-                disabled={submitting}
-              >
-                {submitting ? "Submitting..." : "Submit Application"}
-              </motion.button>
-            </form>
-          </motion.div>
-        </Card>
+                >
+                  {submitting ? "Submitting..." : "Submit Application"}
+                </motion.button>
+              </form>
+            </motion.div>
+          </Card>
+        </div>
       </div>
     </div>
   );

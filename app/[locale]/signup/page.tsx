@@ -111,14 +111,18 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+    <div className="relative min-h-screen flex items-center justify-center animated-gradient-bg overflow-hidden p-4">
+      {/* Floating blobs */}
+      <div className="blob blob-1" />
+      <div className="blob blob-2" />
+      <div className="blob blob-3" />
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.97 }}
           transition={{ duration: 0.4 }}
-          className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 md:p-8"
+          className="w-full max-w-sm relative z-10 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-2xl backdrop-blur-md p-4 md:p-8"
         >
           <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">Create Your Account</h2>
           <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-6">
