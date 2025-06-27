@@ -4,6 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/utils/supabaseClient";
 import toast from "react-hot-toast";
+import { AcademicCapIcon, UserCircleIcon } from "@heroicons/react/24/solid";
+import { motion } from "framer-motion";
 
 export default function ApplyPage() {
   const { id } = useParams();
@@ -168,105 +170,79 @@ export default function ApplyPage() {
       <div className="mb-4">
         <Link href={`/programs/${id}`} className="text-blue-600 hover:underline">&larr; Back to Program</Link>
       </div>
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h1 className="text-2xl font-bold mb-4 text-gray-800">Apply to {program.title}</h1>
-        
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8"
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <AcademicCapIcon className="w-8 h-8 text-blue-500" />
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Apply to {program.title}</h1>
+        </div>
         {/* Program Summary */}
-        <div className="bg-blue-50 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-blue-800 mb-2">Program Details:</h3>
-          <div className="text-sm text-gray-700 space-y-1">
-            <div><span className="font-medium">Type:</span> {program.program_type}</div>
-            <div><span className="font-medium">Location:</span> {program.location}</div>
-            <div><span className="font-medium">Age Group:</span> {program.age_group}</div>
-            <div><span className="font-medium">Cost:</span> {program.cost}</div>
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-4 mb-6 flex items-center gap-4">
+          <UserCircleIcon className="w-8 h-8 text-blue-400" />
+          <div>
+            <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-1">Program Details:</h3>
+            <div className="text-sm text-gray-700 dark:text-gray-200 space-y-1">
+              <div><span className="font-medium">Type:</span> {program.program_type}</div>
+              <div><span className="font-medium">Location:</span> {program.location}</div>
+              <div><span className="font-medium">Age Group:</span> {program.age_group}</div>
+              <div><span className="font-medium">Cost:</span> {program.cost}</div>
+            </div>
           </div>
         </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block font-semibold mb-1 text-gray-700">Child's Full Name *</label>
+            <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">Child's Full Name *</label>
             <input
               type="text"
               name="childName"
               value={form.childName}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               required
               disabled={submitting}
             />
             {errors.childName && <div className="text-red-500 text-sm mt-1">{errors.childName}</div>}
           </div>
           <div>
-            <label className="block font-semibold mb-1 text-gray-700">Child's Age *</label>
+            <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">Child's Age *</label>
             <input
               type="number"
               name="childAge"
               value={form.childAge}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               required
-              min={1}
-              max={18}
               disabled={submitting}
             />
             {errors.childAge && <div className="text-red-500 text-sm mt-1">{errors.childAge}</div>}
           </div>
           <div>
-            <label className="block font-semibold mb-1 text-gray-700">Interests *</label>
+            <label className="block font-semibold mb-1 text-gray-700 dark:text-gray-200">Interests *</label>
             <textarea
               name="interests"
               value={form.interests}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               rows={3}
               required
               disabled={submitting}
-              placeholder="Tell us about your child's interests, hobbies, and what they hope to learn..."
             />
             {errors.interests && <div className="text-red-500 text-sm mt-1">{errors.interests}</div>}
           </div>
-          <div>
-            <label className="block font-semibold mb-1 text-gray-700">Document Upload (optional)</label>
-            <input
-              type="file"
-              name="document"
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              accept=".pdf,.jpg,.png,.doc,.docx"
-              disabled={submitting}
-            />
-            {form.document && (
-              <div className="text-sm text-gray-600 mt-1 flex items-center">
-                <svg className="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
-                </svg>
-                Selected: {form.document.name}
-              </div>
-            )}
-          </div>
-          <button
+          <motion.button
             type="submit"
-            className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors duration-200 ${
-              submitting
-                ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                : "bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            }`}
-            disabled={submitting || !user}
+            whileHover={{ scale: 1.05 }}
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold shadow hover:scale-105 transition-transform text-lg mt-2"
+            disabled={submitting}
           >
-            {submitting ? (
-              <div className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Submitting...
-              </div>
-            ) : (
-              "Submit Application"
-            )}
-          </button>
+            {submitting ? "Submitting..." : "Submit Application"}
+          </motion.button>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 } 
