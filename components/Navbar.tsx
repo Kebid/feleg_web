@@ -17,63 +17,41 @@ export default function Navbar() {
   const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
-    console.log("Navbar useEffect running, checking auth...");
-    
     const getUserAndProfile = async () => {
       try {
-        console.log("Getting user from Supabase...");
-        
-        // Use getSession instead of getUser to avoid AuthSessionMissingError
         const { data: { session }, error } = await supabase.auth.getSession();
-        console.log("Session data:", session, "Error:", error);
-        
         if (error) {
-          console.error("Auth error:", error);
           setUser(null);
           setProfile(null);
         } else {
           setUser(session?.user || null);
-          
           if (session?.user) {
-            console.log("Fetching profile for user:", session.user.id);
             const { data: profileData, error: profileError } = await supabase
               .from("profiles")
               .select("*")
               .eq("id", session.user.id)
               .single();
-            
-            console.log("Profile data:", profileData, "Profile error:", profileError);
-            
             if (!profileError && profileData) {
               setProfile(profileData);
             }
           }
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
         setUser(null);
         setProfile(null);
       } finally {
-        console.log("Setting loading to false");
         setLoading(false);
       }
     };
-
-    // Add timeout to prevent infinite loading
     const timeoutId = setTimeout(() => {
-      console.warn("Auth check timeout after 3 seconds, forcing loading to false");
       setLoading(false);
     }, 3000);
-
     getUserAndProfile().finally(() => {
       clearTimeout(timeoutId);
     });
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session?.user?.id);
       setLoading(true);
       setUser(session?.user ?? null);
-      
       if (session?.user) {
         try {
           const { data: profileData, error } = await supabase
@@ -81,12 +59,10 @@ export default function Navbar() {
             .select("*")
             .eq("id", session.user.id)
             .single();
-          
           if (!error && profileData) {
             setProfile(profileData);
           }
         } catch (error) {
-          console.error("Error fetching profile:", error);
         } finally {
           setLoading(false);
         }
@@ -95,7 +71,6 @@ export default function Navbar() {
         setLoading(false);
       }
     });
-
     return () => subscription.unsubscribe();
   }, []);
 
@@ -104,7 +79,6 @@ export default function Navbar() {
       setSigningOut(true);
       const { error } = await supabase.auth.signOut();
       if (error) {
-        console.error("Sign out error:", error);
         toast.error("Error signing out: " + error.message);
       } else {
         setUser(null);
@@ -113,7 +87,6 @@ export default function Navbar() {
         window.location.href = "/";
       }
     } catch (error) {
-      console.error("Unexpected sign out error:", error);
       toast.error("Error signing out");
     } finally {
       setSigningOut(false);
@@ -131,7 +104,7 @@ export default function Navbar() {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-50"
+      className="bg-white/70 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200/40 dark:border-gray-700/40 shadow-md sticky top-0 z-50"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -151,10 +124,10 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-8">
             {user && (
               <>
-                <Link href="/programs" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
+                <Link href="/programs" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
                   Programs
                 </Link>
-                <Link href="/dashboard/parent" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
+                <Link href="/dashboard/parent" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
                   Dashboard
                 </Link>
               </>
@@ -201,18 +174,20 @@ export default function Navbar() {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center gap-3">
+              <>
                 <Link href="/login">
-                  <Button variant="ghost" size="sm">
+                  <button
+                    className="px-5 py-2 rounded-full bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 transition-all text-base border border-blue-700"
+                  >
                     Sign in
-                  </Button>
+                  </button>
                 </Link>
                 <Link href="/signup">
                   <Button size="sm">
                     Get Started
                   </Button>
                 </Link>
-              </div>
+              </>
             )}
           </div>
         </div>

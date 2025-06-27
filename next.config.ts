@@ -1,12 +1,9 @@
 import type { NextConfig } from "next";
-import createNextIntlPlugin from 'next-intl/plugin';
-
-const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
-    optimizePackageImports: ['next-intl']
+    optimizePackageImports: []
   },
   webpack: (config, { isServer }) => {
     // Optimize chunk loading
@@ -16,14 +13,6 @@ const nextConfig: NextConfig = {
         cacheGroups: {
           default: false,
           vendors: false,
-          // Create a vendor chunk for next-intl
-          nextIntl: {
-            name: 'next-intl',
-            chunks: 'all',
-            test: /[\\/]node_modules[\\/]next-intl[\\/]/,
-            priority: 20,
-          },
-          // Create a vendor chunk for other dependencies
           vendor: {
             name: 'vendor',
             chunks: 'all',
@@ -37,4 +26,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default nextConfig;

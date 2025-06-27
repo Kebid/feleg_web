@@ -1,6 +1,5 @@
 "use client";
 import { usePathname, useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
 
 const locales = [
   { code: 'en', label: 'EN' },
@@ -12,15 +11,9 @@ const locales = [
 export default function LocaleSwitcher() {
   const pathname = usePathname();
   const router = useRouter();
-  
-  // Safe locale hook with fallback
-  let currentLocale = 'en';
-  try {
-    currentLocale = useLocale();
-  } catch (localeError) {
-    console.warn('Locale hook failed, using fallback:', localeError);
-    currentLocale = 'en';
-  }
+
+  // Set currentLocale to 'en' directly
+  const currentLocale = 'en';
 
   const handleLocaleChange = (locale: string) => {
     // Remove the current locale from the pathname and add the new one
@@ -29,17 +22,17 @@ export default function LocaleSwitcher() {
   };
 
   return (
-    <div className="flex gap-2">
+    <select
+      value={currentLocale}
+      onChange={e => handleLocaleChange(e.target.value)}
+      className="px-3 py-1 rounded border text-sm font-medium bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+      aria-label="Select language"
+    >
       {locales.map(({ code, label }) => (
-        <button
-          key={code}
-          onClick={() => handleLocaleChange(code)}
-          className={`px-3 py-1 rounded border text-sm font-medium transition-colors
-            ${currentLocale === code ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 hover:bg-blue-100'}`}
-        >
+        <option key={code} value={code}>
           {label}
-        </button>
+        </option>
       ))}
-    </div>
+    </select>
   );
 } 
