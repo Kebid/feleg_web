@@ -9,6 +9,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Input from '@/components/ui/Input';
+import { Tab } from '@headlessui/react';
+import { Phone, Mail } from 'lucide-react';
 
 const inputVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -23,6 +25,8 @@ const signupSchema = z.object({
 });
 
 type SignupForm = z.infer<typeof signupSchema>;
+
+const ethiopianPhoneRegex = /^(\+251|0)?9\d{8}$/;
 
 export default function SignupPage() {
   const {
@@ -43,6 +47,12 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const [tab, setTab] = useState<'phone' | 'email'>('phone');
+  const [phone, setPhone] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [phoneError, setPhoneError] = useState('');
+  const [otpError, setOtpError] = useState('');
 
   const handleSubmitForm = async (data: SignupForm) => {
     setLoading(true);
@@ -110,6 +120,50 @@ export default function SignupPage() {
     }
   };
 
+  // Phone signup handlers
+  const handlePhoneSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPhoneError('');
+    setOtpError('');
+    if (!ethiopianPhoneRegex.test(phone)) {
+      setPhoneError('Enter a valid Ethiopian phone number');
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({ phone: phone.startsWith('+') ? phone : '+251' + phone.replace(/^0/, '') });
+      if (error) {
+        setPhoneError(error.message);
+      } else {
+        setOtpSent(true);
+        toast.success('OTP sent! Check your SMS.');
+      }
+    } catch (err) {
+      setPhoneError('Failed to send OTP. Try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setOtpError('');
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({ phone: phone.startsWith('+') ? phone : '+251' + phone.replace(/^0/, ''), token: otp, type: 'sms' });
+      if (error) {
+        setOtpError(error.message);
+      } else {
+        toast.success('Phone verified! Account created.');
+        router.push('/dashboard/parent');
+      }
+    } catch (err) {
+      setOtpError('Failed to verify OTP. Try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <AnimatePresence>
@@ -121,101 +175,178 @@ export default function SignupPage() {
           className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 md:p-8"
         >
           <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">Create Your Account</h2>
-          <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-6">
-            <motion.div custom={0} variants={inputVariants} initial="hidden" animate="visible">
-              <label htmlFor="name" className="block text-sm font-medium text-[#111827] mb-1">
-                Name
-              </label>
-              <input
-                id="name"
-                type="text"
-                {...register("name")}
-                placeholder="Your Name"
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
-                required
-                disabled={loading}
-              />
-              {errors.name && <div className="text-red-500 text-sm mt-1">{errors.name.message}</div>}
-            </motion.div>
-            <motion.div custom={1} variants={inputVariants} initial="hidden" animate="visible">
-              <Input
-                label="Email Address"
-                type="email"
-                {...register("email")}
-                required
-                disabled={loading}
-                icon="📧"
-              />
-              {errors.email && <div className="text-red-500 text-sm mt-1">{errors.email.message}</div>}
-            </motion.div>
-            <motion.div custom={2} variants={inputVariants} initial="hidden" animate="visible">
-              <label htmlFor="password" className="block text-sm font-medium text-[#111827] mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  {...register("password")}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
-                  required
-                  disabled={loading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 text-sm"
-                  tabIndex={-1}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                  disabled={loading}
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
-              </div>
-              {errors.password && <div className="text-red-500 text-sm mt-1">{errors.password.message}</div>}
-            </motion.div>
-            <motion.div custom={3} variants={inputVariants} initial="hidden" animate="visible">
-              <label htmlFor="role" className="block text-sm font-medium text-[#111827] mb-1">
-                Role
-              </label>
-              <select
-                id="role"
-                {...register("role")}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
-                disabled={loading}
-              >
-                <option value="parent">Parent</option>
-                <option value="provider">Provider</option>
-              </select>
-              {errors.role && <div className="text-red-500 text-sm mt-1">{errors.role.message}</div>}
-            </motion.div>
-            <motion.button
-              type="submit"
-              whileHover={{ scale: loading ? 1 : 1.03 }}
-              className={`w-full py-2 rounded-lg font-semibold shadow transition focus:outline-none focus:ring-2 focus:ring-offset-2 mt-2 ${
-                loading
-                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                  : "bg-[#3B82F6] text-white hover:bg-blue-700 focus:ring-blue-300"
-              }`}
-              disabled={loading}
-            >
-              {loading ? (
-                <div className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Creating Account...
-                </div>
-              ) : (
-                "Sign Up"
-              )}
-            </motion.button>
-          </form>
-          <div className="text-center text-sm text-gray-500 mt-4">
+          <Tab.Group selectedIndex={tab === 'phone' ? 0 : 1} onChange={i => setTab(i === 0 ? 'phone' : 'email')}>
+            <Tab.List className="flex space-x-2 mb-6">
+              <Tab className={({ selected }) => `flex-1 py-2 rounded-lg font-semibold transition focus:outline-none ${selected ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}>
+                <Phone className="inline w-5 h-5 mr-1" /> Phone
+              </Tab>
+              <Tab className={({ selected }) => `flex-1 py-2 rounded-lg font-semibold transition focus:outline-none ${selected ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}>
+                <Mail className="inline w-5 h-5 mr-1" /> Email
+              </Tab>
+            </Tab.List>
+            <Tab.Panels>
+              {/* Phone Signup Panel */}
+              <Tab.Panel>
+                {!otpSent ? (
+                  <form onSubmit={handlePhoneSignup} className="space-y-6">
+                    <div>
+                      <label htmlFor="phone" className="block text-sm font-medium text-[#111827] mb-1">Phone Number</label>
+                      <input
+                        id="phone"
+                        type="tel"
+                        value={phone}
+                        onChange={e => setPhone(e.target.value)}
+                        placeholder="09xxxxxxxx or +2519xxxxxxxx"
+                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+                        required
+                        disabled={loading}
+                      />
+                      {phoneError && <div className="text-red-500 text-sm mt-1">{phoneError}</div>}
+                    </div>
+                    <motion.button
+                      type="submit"
+                      whileHover={{ scale: loading ? 1 : 1.03 }}
+                      className={`w-full py-2 rounded-lg font-semibold shadow transition focus:outline-none focus:ring-2 focus:ring-offset-2 mt-2 ${
+                        loading
+                          ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                          : "bg-[#3B82F6] text-white hover:bg-blue-700 focus:ring-blue-300"
+                      }`}
+                      disabled={loading}
+                    >
+                      {loading ? 'Sending OTP...' : 'Send OTP'}
+                    </motion.button>
+                  </form>
+                ) : (
+                  <form onSubmit={handleVerifyOtp} className="space-y-6">
+                    <div>
+                      <label htmlFor="otp" className="block text-sm font-medium text-[#111827] mb-1">Enter OTP</label>
+                      <input
+                        id="otp"
+                        type="text"
+                        value={otp}
+                        onChange={e => setOtp(e.target.value)}
+                        placeholder="Enter the code you received"
+                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+                        required
+                        disabled={loading}
+                      />
+                      {otpError && <div className="text-red-500 text-sm mt-1">{otpError}</div>}
+                    </div>
+                    <motion.button
+                      type="submit"
+                      whileHover={{ scale: loading ? 1 : 1.03 }}
+                      className={`w-full py-2 rounded-lg font-semibold shadow transition focus:outline-none focus:ring-2 focus:ring-offset-2 mt-2 ${
+                        loading
+                          ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                          : "bg-[#3B82F6] text-white hover:bg-blue-700 focus:ring-blue-300"
+                      }`}
+                      disabled={loading}
+                    >
+                      {loading ? 'Verifying...' : 'Verify & Create Account'}
+                    </motion.button>
+                  </form>
+                )}
+              </Tab.Panel>
+              {/* Email Signup Panel */}
+              <Tab.Panel>
+                <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-6">
+                  <motion.div custom={0} variants={inputVariants} initial="hidden" animate="visible">
+                    <label htmlFor="name" className="block text-sm font-medium text-[#111827] mb-1">
+                      Name
+                    </label>
+                    <input
+                      id="name"
+                      type="text"
+                      {...register("name")}
+                      placeholder="Your Name"
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+                      required
+                      disabled={loading}
+                    />
+                    {errors.name && <div className="text-red-500 text-sm mt-1">{errors.name.message}</div>}
+                  </motion.div>
+                  <motion.div custom={1} variants={inputVariants} initial="hidden" animate="visible">
+                    <Input
+                      label="Email Address"
+                      type="email"
+                      {...register("email")}
+                      required
+                      disabled={loading}
+                      icon="📧"
+                    />
+                    {errors.email && <div className="text-red-500 text-sm mt-1">{errors.email.message}</div>}
+                  </motion.div>
+                  <motion.div custom={2} variants={inputVariants} initial="hidden" animate="visible">
+                    <label htmlFor="password" className="block text-sm font-medium text-[#111827] mb-1">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        {...register("password")}
+                        placeholder="••••••••"
+                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+                        required
+                        disabled={loading}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 text-sm"
+                        tabIndex={-1}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        disabled={loading}
+                      >
+                        {showPassword ? "Hide" : "Show"}
+                      </button>
+                    </div>
+                    {errors.password && <div className="text-red-500 text-sm mt-1">{errors.password.message}</div>}
+                  </motion.div>
+                  <motion.div custom={3} variants={inputVariants} initial="hidden" animate="visible">
+                    <label htmlFor="role" className="block text-sm font-medium text-[#111827] mb-1">
+                      Role
+                    </label>
+                    <select
+                      id="role"
+                      {...register("role")}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
+                      disabled={loading}
+                    >
+                      <option value="parent">Parent</option>
+                      <option value="provider">Provider</option>
+                    </select>
+                    {errors.role && <div className="text-red-500 text-sm mt-1">{errors.role.message}</div>}
+                  </motion.div>
+                  <motion.button
+                    type="submit"
+                    whileHover={{ scale: loading ? 1 : 1.03 }}
+                    className={`w-full py-2 rounded-lg font-semibold shadow transition focus:outline-none focus:ring-2 focus:ring-offset-2 mt-2 ${
+                      loading
+                        ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                        : "bg-[#3B82F6] text-white hover:bg-blue-700 focus:ring-blue-300"
+                    }`}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <div className="flex items-center justify-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Creating Account...
+                      </div>
+                    ) : (
+                      "Sign Up"
+                    )}
+                  </motion.button>
+                </form>
+              </Tab.Panel>
+            </Tab.Panels>
+          </Tab.Group>
+          <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
             Already have an account?{' '}
-            <Link href="/login" className="text-[#3B82F6] hover:underline font-medium">Login</Link>
+            <Link href="/login" className="text-blue-600 hover:underline">Sign in</Link>
           </div>
         </motion.div>
       </AnimatePresence>
