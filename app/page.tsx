@@ -92,10 +92,14 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="relative min-h-screen animated-gradient-bg overflow-hidden">
+      {/* Floating blobs */}
+      <div className="blob blob-1" />
+      <div className="blob blob-2" />
+      <div className="blob blob-3" />
+      
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 dark:from-blue-900/20 dark:to-purple-900/20"></div>
+      <section className="relative z-10 overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
           <motion.div
             variants={containerVariants}
@@ -139,7 +143,7 @@ export default function HomePage() {
               
               <Link href="/signup">
                 <motion.button
-                  className="px-8 py-4 bg-white dark:bg-gray-900 border-2 border-blue-600 text-blue-600 dark:text-blue-300 font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-lg"
+                  className="px-8 py-4 bg-white/90 dark:bg-gray-900/90 border-2 border-blue-600 text-blue-600 dark:text-blue-300 font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-lg backdrop-blur-sm"
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -152,7 +156,7 @@ export default function HomePage() {
       </section>
 
       {/* Featured Programs Section */}
-      <section className="py-20 bg-white dark:bg-gray-900">
+      <section className="relative z-10 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -188,7 +192,7 @@ export default function HomePage() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card hover className="h-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+                <Card hover className="h-full bg-white/80 dark:bg-gray-900/80 border border-gray-100/50 dark:border-gray-700/50 shadow-2xl backdrop-blur-md">
                   <div className="relative">
                     {program.featured && (
                       <div className="absolute -top-3 -right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
@@ -204,7 +208,7 @@ export default function HomePage() {
                       </p>
                     </div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100/80 dark:bg-blue-900/80 text-blue-800 dark:text-blue-200 backdrop-blur-sm">
                           {program.program_type}
                       </span>
                       <span className="text-lg font-bold text-green-600 dark:text-green-400">
@@ -217,7 +221,7 @@ export default function HomePage() {
                     </div>
                     <Link href={`/programs/${program.id}`}>
                       <motion.button
-                        className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition-all duration-300 dark:bg-blue-700 dark:hover:bg-blue-800"
+                        className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
                         whileHover={{ scale: 1.03, y: -2 }}
                         whileTap={{ scale: 0.97 }}
                       >
@@ -234,31 +238,38 @@ export default function HomePage() {
       </section>
 
       {/* How Feleg Works Section */}
-      <HowFelegWorks />
+      <section className="relative z-10">
+        <HowFelegWorks />
+      </section>
 
       {/* CTA Section */}
-      <div className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-800 dark:to-purple-900">
+      <section className="relative z-10 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
+            className="bg-white/10 dark:bg-gray-900/10 rounded-3xl p-12 backdrop-blur-md border border-white/20 dark:border-gray-700/20"
           >
-            <h2 className="text-4xl font-bold text-white mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Ready to Get Started?
             </h2>
-            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
               Join thousands of parents who trust Feleg to find the perfect enrichment programs for their children.
             </p>
             <Link href="/signup">
-              <Button size="lg" variant="secondary" className="text-lg px-8 py-4">
+              <motion.button
+                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-lg"
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 Create Your Account
-              </Button>
+              </motion.button>
             </Link>
           </motion.div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
