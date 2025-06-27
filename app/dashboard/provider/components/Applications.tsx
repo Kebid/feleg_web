@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/utils/supabaseClient";
 import { Skeleton } from '@/components/ui';
+import { UserGroupIcon, AcademicCapIcon, ClockIcon, CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 
 function statusColor(status: string) {
   if (status === "Accepted") return "text-green-600 bg-green-100";
@@ -172,13 +173,8 @@ export default function Applications() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <div>
       <h2 className="text-xl font-bold mb-6 text-green-700">All Applications</h2>
-      
       {/* Filters */}
       <div className="flex flex-wrap gap-4 mb-6">
         <select
@@ -202,71 +198,64 @@ export default function Applications() {
           <option value="Rejected">Rejected</option>
         </select>
       </div>
-
-      {filteredApps.length === 0 ? (
-        <div className="text-center py-8">
-          <div className="text-gray-500 mb-2">
-            {applications.length === 0 ? "No applications found." : "No applications match your filters."}
-          </div>
-          {applications.length === 0 && (
-            <div className="text-sm text-gray-400">
-              Applications will appear here once parents apply to your programs.
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredApps.length === 0 && (
+          <div className="col-span-full flex flex-col items-center justify-center py-12">
+            <UserGroupIcon className="w-12 h-12 text-green-200 mb-2" />
+            <div className="text-center text-gray-500 font-medium">
+              No applications found.
             </div>
-          )}
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white rounded-lg shadow">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Program</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Child Name</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Age</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Submitted</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredApps.map((app) => (
-                <tr key={app.id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="px-4 py-3 font-semibold text-gray-900">
-                    {app.program?.title || "Unknown Program"}
-                  </td>
-                  <td className="px-4 py-3 text-gray-700">{app.child_name}</td>
-                  <td className="px-4 py-3 text-gray-700">{app.child_age}</td>
-                  <td className="px-4 py-3">
-                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColor(app.status)}`}>
-                      {app.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-700">
-                    {new Date(app.submitted_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3">
-                    {app.status === "Pending" && (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleAction(app.id, "Accepted")}
-                          className="px-3 py-1 rounded bg-green-500 text-white text-sm font-semibold hover:bg-green-600 transition-colors"
-                        >
-                          Accept
-                        </button>
-                        <button
-                          onClick={() => handleAction(app.id, "Rejected")}
-                          className="px-3 py-1 rounded bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors"
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </motion.div>
+          </div>
+        )}
+        {filteredApps.map((app, i) => (
+          <motion.div
+            key={app.id}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.05 * i }}
+            className="bg-white dark:bg-gray-900 rounded-2xl shadow hover:shadow-lg transition-all p-6 flex flex-col gap-3 border border-green-100 dark:border-gray-800 relative"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <AcademicCapIcon className="w-7 h-7 text-blue-500" />
+              <div>
+                <div className="font-bold text-lg text-gray-900 dark:text-white">{app.program?.title || 'Program'}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{app.program?.id || 'ID'}</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+              <UserGroupIcon className="w-5 h-5 text-purple-500" />
+              <span className="font-semibold">{app.child_name}</span>
+              <span className="mx-1">|</span>
+              <span>Age {app.child_age}</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <ClockIcon className="w-4 h-4" />
+              <span>Submitted: {new Date(app.submitted_at).toLocaleDateString()}</span>
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              {app.status === 'Accepted' && <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold"><CheckCircleIcon className="w-4 h-4" /> Accepted</span>}
+              {app.status === 'Pending' && <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-semibold"><ClockIcon className="w-4 h-4" /> Pending</span>}
+              {app.status === 'Rejected' && <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold"><XCircleIcon className="w-4 h-4" /> Rejected</span>}
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => handleAction(app.id, 'Accepted')}
+                className="flex-1 bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-2 rounded-xl shadow hover:scale-105 transition-transform"
+                disabled={app.status === 'Accepted'}
+              >
+                Accept
+              </button>
+              <button
+                onClick={() => handleAction(app.id, 'Rejected')}
+                className="flex-1 bg-red-100 text-red-700 font-semibold py-2 rounded-xl shadow hover:scale-105 transition-transform"
+                disabled={app.status === 'Rejected'}
+              >
+                Reject
+              </button>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
   );
 }

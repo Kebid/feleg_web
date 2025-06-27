@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { motion } from "framer-motion";
+import { UserGroupIcon, AcademicCapIcon, ClockIcon, CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/solid";
 
 function statusColor(status: string) {
   if (status === "Accepted") return "text-green-600 bg-green-100";
@@ -158,222 +159,47 @@ export default function ApplicationTracker() {
   }
 
   return (
-    <>
-      {/* Notification Banner */}
-      {unreadNotifications > 0 && (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {applications.map((app, i) => (
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          key={app.id}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg"
+          transition={{ duration: 0.4, delay: 0.05 * i }}
+          className="bg-white dark:bg-gray-900 rounded-2xl shadow hover:shadow-lg transition-all p-6 flex flex-col gap-3 border border-blue-100 dark:border-gray-800 relative"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <span className="text-2xl mr-3">🔔</span>
-              <div>
-                <h4 className="font-semibold text-blue-900">
-                  You have {unreadNotifications} new notification{unreadNotifications > 1 ? 's' : ''}!
-                </h4>
-                <p className="text-blue-700 text-sm">
-                  Check your application status updates.
-                </p>
-              </div>
+          <div className="flex items-center gap-3 mb-2">
+            <AcademicCapIcon className="w-7 h-7 text-blue-500" />
+            <div>
+              <div className="font-bold text-lg text-gray-900 dark:text-white">{app.program?.title || 'Program'}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">{app.program?.location || 'Location'} • {app.program?.delivery_mode || 'Mode'}</div>
             </div>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+            <UserGroupIcon className="w-5 h-5 text-purple-500" />
+            <span className="font-semibold">{app.child_name}</span>
+            <span className="mx-1">|</span>
+            <span>Age {app.child_age}</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <ClockIcon className="w-4 h-4" />
+            <span>Submitted: {new Date(app.submitted_at).toLocaleDateString()}</span>
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            {app.status === 'Accepted' && <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold"><CheckCircleIcon className="w-4 h-4" /> Accepted</span>}
+            {app.status === 'Pending' && <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-semibold"><ClockIcon className="w-4 h-4" /> Pending</span>}
+            {app.status === 'Rejected' && <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold"><XCircleIcon className="w-4 h-4" /> Rejected</span>}
+          </div>
+          <div className="flex gap-2 mt-4">
             <button
-              onClick={() => window.location.reload()}
-              className="text-blue-600 hover:text-blue-800 underline text-sm"
+              onClick={() => handleViewDetails(app)}
+              className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-2 rounded-xl shadow hover:scale-105 transition-transform"
             >
-              View all
+              View Details
             </button>
           </div>
         </motion.div>
-      )}
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded-lg shadow">
-          <thead>
-            <tr className="border-b border-gray-200">
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Program Title</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Child Name</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Age</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Submission Date</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {applications.map((app) => (
-              <tr key={app.id} className="border-b border-gray-100 hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-gray-900">
-                  {app.program?.title || "Unknown Program"}
-                </td>
-                <td className="px-4 py-3 text-gray-700">{app.child_name}</td>
-                <td className="px-4 py-3 text-gray-700">{app.child_age}</td>
-                <td className="px-4 py-3 text-gray-700">
-                  {new Date(app.submitted_at).toLocaleDateString()}
-                </td>
-                <td className="px-4 py-3">
-                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColor(app.status)}`}>
-                    {app.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <button
-                    onClick={() => handleViewDetails(app)}
-                    className="text-blue-600 hover:text-blue-800 underline text-sm"
-                  >
-                    View Details
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Application Details Modal */}
-      {selectedApplication && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-blue-700">Application Details</h2>
-              <button
-                onClick={closeDetails}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Application Status */}
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-gray-900">Application Status</h3>
-                  <p className="text-sm text-gray-600">
-                    Submitted on {new Date(selectedApplication.submitted_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColor(selectedApplication.status)}`}>
-                  {selectedApplication.status}
-                </span>
-              </div>
-            </div>
-
-            {/* Child Information */}
-            <div className="mb-6">
-              <h3 className="font-semibold text-gray-900 mb-3">Child Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Child Name</label>
-                  <p className="text-gray-900">{selectedApplication.child_name}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Age</label>
-                  <p className="text-gray-900">{selectedApplication.child_age} years old</p>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">Interests</label>
-                  <p className="text-gray-900">{selectedApplication.interests}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Program Information */}
-            <div className="mb-6">
-              <h3 className="font-semibold text-gray-900 mb-3">Program Information</h3>
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="text-lg font-semibold text-blue-900 mb-2">
-                  {selectedApplication.program?.title || "Unknown Program"}
-                </h4>
-                <p className="text-blue-800 mb-4">{selectedApplication.program?.description || "No description available"}</p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-blue-700">Program Type</label>
-                    <p className="text-blue-900">{selectedApplication.program?.program_type || "Not specified"}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-blue-700">Location</label>
-                    <p className="text-blue-900">{selectedApplication.program?.location || "Not specified"}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-blue-700">Delivery Mode</label>
-                    <p className="text-blue-900">{selectedApplication.program?.delivery_mode || "Not specified"}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-blue-700">Duration</label>
-                    <p className="text-blue-900">{selectedApplication.program?.duration || "Not specified"}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-blue-700">Age Group</label>
-                    <p className="text-blue-900">{selectedApplication.program?.age_group || "Not specified"}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-blue-700">Cost</label>
-                    <p className="text-blue-900">{selectedApplication.program?.cost || "Not specified"}</p>
-                  </div>
-                </div>
-
-                {(selectedApplication.program?.contact_email || selectedApplication.program?.website) && (
-                  <div className="mt-4 pt-4 border-t border-blue-200">
-                    <h5 className="font-medium text-blue-700 mb-2">Contact Information</h5>
-                    <div className="space-y-1">
-                      {selectedApplication.program?.contact_email && (
-                        <p className="text-blue-900">
-                          <span className="font-medium">Email:</span> {selectedApplication.program.contact_email}
-                        </p>
-                      )}
-                      {selectedApplication.program?.website && (
-                        <p className="text-blue-900">
-                          <span className="font-medium">Website:</span>{" "}
-                          <a 
-                            href={selectedApplication.program.website} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline"
-                          >
-                            {selectedApplication.program.website}
-                          </a>
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Status-specific information */}
-            {selectedApplication.status === "Accepted" && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <h4 className="font-semibold text-green-800 mb-2">🎉 Congratulations!</h4>
-                <p className="text-green-700">
-                  Your application has been accepted! The provider will contact you with next steps 
-                  and additional information about the program.
-                </p>
-              </div>
-            )}
-
-            {selectedApplication.status === "Rejected" && (
-              <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <h4 className="font-semibold text-yellow-800 mb-2">Application Update</h4>
-                <p className="text-yellow-700">
-                  Your application was not accepted for this program. Don't worry - there are many 
-                  other great programs available. Keep exploring and applying!
-                </p>
-              </div>
-            )}
-
-            <div className="flex justify-end">
-              <button
-                onClick={closeDetails}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+      ))}
+    </div>
   );
 } 

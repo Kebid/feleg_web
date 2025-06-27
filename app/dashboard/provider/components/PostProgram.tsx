@@ -5,6 +5,8 @@ import { Skeleton } from '@/components/ui';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AcademicCapIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
+import { motion } from "framer-motion";
 
 const programTypes = ["STEM", "Arts", "Sports", "Other"];
 const deliveryModes = ["Online", "In-Person"];
@@ -101,8 +103,16 @@ export default function PostProgram() {
 
   return (
     <div className="max-w-xl mx-auto p-4">
-      <div className="bg-white rounded shadow p-6">
-        <h1 className="text-2xl font-bold mb-4">Post a New Program</h1>
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6"
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <PlusCircleIcon className="w-8 h-8 text-blue-500" />
+          <h1 className="text-2xl font-bold">Post a New Program</h1>
+        </div>
         {success && (
           <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">Program posted successfully!</div>
         )}
@@ -196,13 +206,13 @@ export default function PostProgram() {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 transition-colors"
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-xl font-semibold hover:scale-105 transition-transform shadow"
             disabled={submitting}
           >
-            {submitting ? "Posting..." : "Post Program"}
+            {submitting ? 'Posting...' : 'Post Program'}
           </button>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 } 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { supabase } from "@/utils/supabaseClient";
 import toast from "react-hot-toast";
+import { AcademicCapIcon, MapPinIcon, DeviceTabletIcon, BookmarkIcon, CurrencyDollarIcon, ClockIcon } from "@heroicons/react/24/solid";
 
 export default function FindPrograms() {
   const [programs, setPrograms] = useState<any[]>([]);
@@ -190,40 +191,56 @@ export default function FindPrograms() {
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredPrograms.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center py-12">
-            <span className="text-5xl text-blue-200 mb-2">🔍</span>
+            <BookmarkIcon className="w-12 h-12 text-blue-200 mb-2" />
             <div className="text-center text-gray-500 font-medium">
-              {programs.length === 0 ? "No programs available yet." : "No programs found.<br/>Try adjusting your filters."}
+              {programs.length === 0 ? "No programs available yet." : "No programs found. Try adjusting your filters."}
             </div>
           </div>
         )}
-        {filteredPrograms.map((program) => (
-          <div key={program.id} className="bg-white rounded-xl shadow-lg p-5 flex flex-col relative border border-blue-100 hover:shadow-xl transition-shadow">
-            <button
-              className={`absolute top-2 right-2 text-xl ${bookmarks.includes(program.id) ? "text-red-500" : "text-gray-300"} transition-colors`}
-              onClick={() => toggleBookmark(program.id)}
-              aria-label="Bookmark"
-              type="button"
-            >
-              {bookmarks.includes(program.id) ? "♥" : "♡"}
-            </button>
-            <h3 className="text-lg font-bold mb-2 text-blue-800">{program.title}</h3>
-            <div className="mb-1"><span className="font-semibold">Type:</span> {program.program_type}</div>
-            <div className="mb-1"><span className="font-semibold">Location:</span> {program.location}</div>
-            <div className="mb-1"><span className="font-semibold">Age Group:</span> {program.age_group}</div>
-            <div className="mb-1"><span className="font-semibold">Cost:</span> {program.cost}</div>
-            <div className="mb-1"><span className="font-semibold">Delivery:</span> {program.delivery_mode}</div>
-            {program.description && (
-              <div className="mb-2 text-sm text-gray-600 line-clamp-2">
-                {program.description}
+        {filteredPrograms.map((program, i) => (
+          <motion.div
+            key={program.id}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.05 * i }}
+            className="bg-white dark:bg-gray-900 rounded-2xl shadow hover:shadow-lg transition-all p-5 flex flex-col border border-blue-100 dark:border-gray-800 relative"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <AcademicCapIcon className="w-7 h-7 text-blue-500" />
+              <div>
+                <div className="font-bold text-lg text-gray-900 dark:text-white">{program.title}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{program.location} • {program.delivery_mode}</div>
               </div>
-            )}
-            <Link
-              href={`/programs/${program.id}`}
-              className="mt-4 bg-blue-600 text-white px-3 py-2 rounded text-center hover:bg-blue-700 transition-colors font-semibold shadow-sm"
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+              <DeviceTabletIcon className="w-5 h-5 text-purple-500" />
+              <span className="font-semibold">{program.program_type}</span>
+              <span className="mx-1">|</span>
+              <span>{program.age_group}</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <MapPinIcon className="w-4 h-4" />
+              <span>{program.location}</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <CurrencyDollarIcon className="w-4 h-4" />
+              <span>{program.cost}</span>
+              <ClockIcon className="w-4 h-4 ml-2" />
+              <span>{program.duration}</span>
+            </div>
+            <button
+              onClick={() => toggleBookmark(program.id)}
+              className={`absolute top-4 right-4 p-2 rounded-full transition-colors ${bookmarks.includes(program.id) ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-blue-50 hover:text-blue-600'}`}
+              aria-label={bookmarks.includes(program.id) ? 'Remove bookmark' : 'Add bookmark'}
             >
-              View Details
-            </Link>
-          </div>
+              <BookmarkIcon className="w-6 h-6" fill={bookmarks.includes(program.id) ? '#2563EB' : 'none'} />
+            </button>
+            <div className="flex gap-2 mt-4">
+              <Link href={`/programs/${program.id}`} className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-2 rounded-xl shadow hover:scale-105 transition-transform text-center">
+                View Details
+              </Link>
+            </div>
+          </motion.div>
         ))}
       </div>
     </div>
