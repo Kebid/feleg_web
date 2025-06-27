@@ -11,7 +11,6 @@ import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { HiOutlineUser } from "react-icons/hi2";
 import { FaRocket } from "react-icons/fa6";
 import { Menu, X, LogOut, User, LayoutDashboard, BookOpen, Globe } from 'lucide-react';
-import FloatingControls from "@/components/FloatingControls";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -136,6 +135,9 @@ export default function Navbar() {
 
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-4">
+              <ThemeToggle className="w-8 h-4 scale-90 opacity-70" />
+              <div className="flex-1" />
+              <LocaleSwitcher className="w-16 h-7 text-xs px-1 py-0.5 rounded bg-white/60 dark:bg-gray-800/60 border border-gray-200/40 dark:border-gray-700/40 shadow-sm ml-2" />
               {loading && !["/login","/signup","/forgot-password","/reset-password"].some(p => pathname.startsWith(p)) ? (
                 <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
               ) : user ? (
@@ -283,7 +285,6 @@ export default function Navbar() {
           )}
         </AnimatePresence>
       </nav>
-      <FloatingControls />
     </>
   );
 } 

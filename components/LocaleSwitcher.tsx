@@ -8,7 +8,7 @@ const locales = [
   { code: 'ti', label: 'ትግ' },
 ];
 
-export default function LocaleSwitcher() {
+export default function LocaleSwitcher({ className = "" }: { className?: string }) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -25,7 +25,7 @@ export default function LocaleSwitcher() {
     <select
       value={currentLocale}
       onChange={e => handleLocaleChange(e.target.value)}
-      className="px-3 py-1 rounded border text-sm font-medium bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+      className={`px-3 py-1 rounded border text-sm font-medium bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 ${className}`}
       aria-label="Select language"
     >
       {locales.map(({ code, label }) => (
