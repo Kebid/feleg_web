@@ -8,6 +8,7 @@ import ViewProviderProfile from "@/components/ViewProviderProfile";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 import { ImageOff, MapPin, Globe, Users, Calendar, BadgeDollarSign, Clock, UserCircle } from "lucide-react";
+import Card from "@/components/ui/Card";
 
 export default function ProgramDetailsPage() {
   const params = useParams();
@@ -72,19 +73,19 @@ export default function ProgramDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen py-10 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10 flex flex-col justify-center">
       <div className="max-w-4xl mx-auto p-6">
         <div className="mb-4">
           <Link href="/dashboard/parent" className="text-blue-600 hover:underline">&larr; Back to Search</Link>
         </div>
         {/* Program Details */}
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.42, 0, 0.58, 1] }}
-          className="bg-gradient-to-br from-white via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 p-0 overflow-hidden mb-10"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="p-0 md:p-0 bg-white/90 dark:bg-gray-900/90 shadow-xl rounded-2xl border-none mb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.42, 0, 0.58, 1] }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
             {/* Media Section */}
             <div className="flex flex-col items-center justify-center p-8">
               {program.media && program.media.length > 0 ? (
@@ -165,25 +166,25 @@ export default function ProgramDetailsPage() {
                 </Link>
               </motion.div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </Card>
         {/* Provider Profile */}
         {program.provider_id && (
-          <motion.div
-            initial={{ opacity: 0, y: 32 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: [0.42, 0, 0.58, 1] }}
-            className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow p-8 flex flex-col items-center mb-6"
-          >
-            <div className="flex flex-col items-center gap-2 mb-4">
+          <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow p-8 flex flex-col items-center mb-6 border-none">
+            <motion.div
+              initial={{ opacity: 0, y: 32 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2, ease: [0.42, 0, 0.58, 1] }}
+              className="flex flex-col items-center gap-2 mb-4"
+            >
               <UserCircle className="w-14 h-14 text-blue-400" />
               <span className="font-bold text-lg text-gray-900 dark:text-white">Provider</span>
               <span className="text-sm text-gray-500 dark:text-gray-300">Trusted enrichment partner</span>
-            </div>
+            </motion.div>
             <div className="w-full max-w-md">
               <ViewProviderProfile providerId={program.provider_id} />
             </div>
-          </motion.div>
+          </Card>
         )}
       </div>
     </div>
